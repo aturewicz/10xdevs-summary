@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pl" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>10xDEVS 4.0 — Podsumowanie Misji</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta property="og:title" content="Podsumowanie 5-tygodniowego kursu 10xDEVS 4.0 — 26/26 osiągnięć" />
+<meta property="og:description" content="Interaktywny raport z ukończenia szkolenia AI-Native Software Engineering: PRD, Multi-Agent Workflows, Testy E2E, Refaktoryzacja i Agent SDK." />
+<meta property="og:image" content="images/profil.jpg" />
+<meta property="og:type" content="website" />
+  <style>
+    :root {
+      --bg-deep: #05070f;
+      --neon-purple: #a855f7;
+      --neon-cyan: #06b6d4;
+      --neon-gold: #f59e0b;
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .font-hud {
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    /* Kosmiczne tło z mgławicami i siatką */
+    .space-bg {
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 85% 25%, rgba(6, 182, 212, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 50% 60%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 20% 85%, rgba(168, 85, 247, 0.15) 0%, transparent 45%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+      background-attachment: fixed;
+    }
+
+    /* Ścięte narożniki HUD sci-fi */
+    .hud-frame {
+      clip-path: polygon(
+        20px 0%, calc(100% - 20px) 0%, 
+        100% 20px, 100% calc(100% - 20px), 
+        calc(100% - 20px) 100%, 20px 100%, 
+        0% calc(100% - 20px), 0% 20px
+      );
+    }
+
+    .hud-tab {
+      clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 100%, 0% 100%);
+    }
+
+    /* Efekt poświaty i unoszenia karty */
+    .badge-card {
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+
+    .badge-card:hover {
+      transform: translateY(-8px) scale(1.03);
+      z-index: 20;
+    }
+
+    /* Animacja paska skanowania na profilu */
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(400%); }
+    }
+    .animate-scan {
+      animation: scanline 4s linear infinite;
+    }
+  </style>
+</head>
+<body class="space-bg min-h-screen antialiased selection:bg-purple-500 selection:text-white">
+
+  <!-- GŁÓWNY KONTENER -->
+  <div class="max-w-[1540px] mx-auto px-4 sm:px-8 py-10 space-y-14">
+
+    <!-- HERO SECTION (PROFIL + STATYSTYKI MISJI) -->
+    <header class="relative p-[1px] bg-gradient-to-r from-purple-500/60 via-cyan-400/60 to-purple-500/60 hud-frame shadow-[0_0_60px_rgba(168,85,247,0.2)]">
+      <div class="bg-[#0a0e1d]/90 backdrop-blur-xl p-6 sm:p-10 hud-frame">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- Lewa kolumna: Oryginalne zdjęcie profilowe -->
+          <div class="lg:col-span-5 xl:col-span-4 flex justify-center">
+            <div class="relative group w-full max-w-[400px] rounded-2xl overflow-hidden border-2 border-cyan-400/50 shadow-[0_0_40px_rgba(6,182,212,0.25)]">
+              <img src="images/profil.jpg" alt="Profil 10xDEVS" class="w-full h-auto block object-cover transition duration-500 group-hover:scale-[1.02]" />
+              <div class="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-cyan-400/20 to-transparent pointer-events-none animate-scan"></div>
+            </div>
+          </div>
+
+          <!-- Prawa kolumna: Dane misji i postęp -->
+          <div class="lg:col-span-7 xl:col-span-8 space-y-6">
+            <div class="flex flex-wrap items-center gap-3">
+              <span class="px-3 py-1 text-xs font-hud font-bold tracking-widest uppercase bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 rounded-full">
+                RAPORT KOŃCOWY // 10xDEVS 4.0
+              </span>
+              <span class="px-3 py-1 text-xs font-hud font-bold tracking-widest uppercase bg-purple-500/15 text-purple-300 border border-purple-400/40 rounded-full">
+                FULLSTACK DIVISION
+              </span>
+            </div>
+
+            <div>
+              <h1 class="font-hud text-3xl sm:text-5xl xl:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-200 drop-shadow-[0_2px_20px_rgba(255,255,255,0.15)]">
+                PODSUMOWANIE MISJI
+              </h1>
+              <p class="mt-3 text-slate-300 text-base sm:text-lg max-w-3xl leading-relaxed">
+                Kompletny zapis 5-tygodniowego szkolenia <strong class="text-white">AI-Native Software Engineering</strong>. Od inżynierii wymagań i pracy z wieloma agentami, aż po automatyczne Code Review w CI/CD i systemy autonomiczne.
+              </p>
+            </div>
+
+            <!-- Kafelki ze statystykami -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div class="bg-[#11172e]/90 border border-amber-400/40 rounded-xl p-4 shadow-[0_0_25px_rgba(245,158,11,0.1)]">
+                <div class="text-xs font-hud uppercase tracking-wider text-slate-400">Zdobyte odznaki</div>
+                <div class="mt-1 font-hud text-2xl sm:text-3xl font-bold text-amber-400">26 / 26</div>
+              </div>
+
+              <div class="bg-[#11172e]/90 border border-cyan-400/40 rounded-xl p-4 shadow-[0_0_25px_rgba(6,182,212,0.1)]">
+                <div class="text-xs font-hud uppercase tracking-wider text-slate-400">Czas trwania</div>
+                <div class="mt-1 font-hud text-2xl sm:text-3xl font-bold text-cyan-300">5 TYGODNI</div>
+              </div>
+
+              <div class="bg-[#11172e]/90 border border-emerald-400/40 rounded-xl p-4 shadow-[0_0_25px_rgba(16,185,129,0.1)]">
+                <div class="text-xs font-hud uppercase tracking-wider text-slate-400">Status misji</div>
+                <div class="mt-1 font-hud text-2xl sm:text-3xl font-bold text-emerald-400">100% UKOŃCZONO</div>
+              </div>
+            </div>
+
+            <!-- Pasek postępu -->
+            <div class="space-y-2 pt-1">
+              <div class="flex justify-between text-xs font-hud tracking-wider text-slate-400">
+                <span>CEL MISJI: PRZYSPIESZENIE PRACY Z AI</span>
+                <span class="text-cyan-300 font-bold">POZIOM MAKSYMALNY (100%)</span>
+              </div>
+              <div class="h-3 w-full bg-slate-900 rounded-full overflow-hidden border border-purple-500/40 p-0.5">
+                <div class="h-full w-full rounded-full bg-gradient-to-r from-cyan-400 via-purple-500 to-amber-400 shadow-[0_0_15px_rgba(168,85,247,0.8)]"></div>
+              </div>
+            </div>
+
+            <!-- Filtry tygodni -->
+            <div class="pt-2 flex flex-wrap items-center gap-2" id="week-filters">
+              <button data-filter="all" class="filter-btn active px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-purple-600 text-white border border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.5)] transition cursor-pointer">
+                Wszystkie (26)
+              </button>
+              <button data-filter="1" class="filter-btn px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-slate-900/80 text-slate-300 border border-slate-700 hover:border-sky-400 transition cursor-pointer">
+                Tydzień 1
+              </button>
+              <button data-filter="2" class="filter-btn px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-slate-900/80 text-slate-300 border border-slate-700 hover:border-cyan-400 transition cursor-pointer">
+                Tydzień 2
+              </button>
+              <button data-filter="3" class="filter-btn px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-slate-900/80 text-slate-300 border border-slate-700 hover:border-slate-300 transition cursor-pointer">
+                Tydzień 3
+              </button>
+              <button data-filter="4" class="filter-btn px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-slate-900/80 text-slate-300 border border-slate-700 hover:border-amber-400 transition cursor-pointer">
+                Tydzień 4
+              </button>
+              <button data-filter="5" class="filter-btn px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-slate-900/80 text-slate-300 border border-slate-700 hover:border-purple-400 transition cursor-pointer">
+                Tydzień 5
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- KONTENER NA SEKCJE TYGODNI (GENEROWANY DYNAMICZNIE Z TWOICH ORYGINALNYCH ZDJĘĆ) -->
+    <main id="weeks-container" class="space-y-12"></main>
+
+    <!-- STOPKA -->
+    <footer class="text-center pb-8 pt-4">
+      <div class="inline-block px-8 py-4 bg-[#0a0e1d]/90 border border-purple-500/40 hud-frame shadow-[0_0_30px_rgba(168,85,247,0.15)]">
+        <p class="font-hud text-sm sm:text-base tracking-widest text-slate-300">
+          10xDEVS 4.0 EDITION <span class="text-purple-400 mx-2">•</span> <span class="text-cyan-300">Kliknij dowolną odznakę, aby powiększyć w pełnej rozdzielczości</span>
+        </p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- MODAL / LIGHTBOX DO POWIĘKSZANIA ORYGINALNYCH ODZNAK -->
+  <div id="lightbox" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4" onclick="closeLightbox()">
+    <div class="relative max-w-lg w-full animate-[fadeIn_0.2s_ease-out]" onclick="event.stopPropagation()">
+      <button onclick="closeLightbox()" class="absolute -top-12 right-0 px-4 py-1.5 bg-slate-800/90 hover:bg-purple-600 text-white font-hud text-xs tracking-wider rounded-lg border border-slate-600 transition cursor-pointer">
+        ZAMKNIJ [ESC]
+      </button>
+      <img id="lightbox-img" src="" alt="Powiększona odznaka" class="w-full h-auto rounded-2xl border-2 border-purple-400/70 shadow-[0_0_50px_rgba(168,85,247,0.4)]" />
+    </div>
+  </div>
+
+  <script>
+    const weeksData = [
+      {
+        week: 1,
+        title: "TYDZIEŃ 01",
+        subtitle: "Fundamenty & AI-Native Workflow",
+        borderClass: "from-sky-400/50 via-blue-500/40 to-sky-400/50",
+        badgeHover: "hover:shadow-[0_10px_35px_rgba(56,189,248,0.35)] hover:border-sky-400",
+        accentText: "text-sky-300",
+        tagBg: "bg-sky-500/20 border-sky-400/40 text-sky-200",
+        colsClass: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
+        cards: [
+          { file: "images/1.1.jpg", label: "1.1 Product Requirement Docs" },
+          { file: "images/1.2.jpg", label: "1.2 Agent Skills" },
+          { file: "images/1.3.jpg", label: "1.3 Project Bootstrap" },
+          { file: "images/1.4.jpg", label: "1.4 Rules for AI" },
+          { file: "images/1.5.jpg", label: "1.5 Deployment Readiness" }
+        ]
+      },
+      {
+        week: 2,
+        title: "TYDZIEŃ 02",
+        subtitle: "Architektura, Implementacja & Multi-Agent",
+        borderClass: "from-cyan-400/60 via-teal-400/40 to-cyan-400/60",
+        badgeHover: "hover:shadow-[0_10px_35px_rgba(6,182,212,0.4)] hover:border-cyan-400",
+        accentText: "text-cyan-300",
+        tagBg: "bg-cyan-500/20 border-cyan-400/40 text-cyan-200",
+        colsClass: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6",
+        cards: [
+          { file: "images/2.1.jpg", label: "2.1 Roadmapa projektu" },
+          { file: "images/2.2.jpg", label: "2.2 Planowanie feature'a" },
+          { file: "images/2.3.jpg", label: "2.3 Implementacja" },
+          { file: "images/2.4.jpg", label: "2.4 Inner Quality Gates" },
+          { file: "images/2.5.jpg", label: "2.5 Multi-Agent Workflows" },
+          { file: "images/2.6.jpg", label: "2.6 Praca nad interfejsem graficznym (BONUS)" }
+        ]
+      },
+      {
+        week: 3,
+        title: "TYDZIEŃ 03",
+        subtitle: "Jakość, Testy E2E & Debugowanie",
+        borderClass: "from-slate-300/50 via-indigo-400/40 to-slate-300/50",
+        badgeHover: "hover:shadow-[0_10px_35px_rgba(148,163,184,0.35)] hover:border-slate-300",
+        accentText: "text-slate-200",
+        tagBg: "bg-slate-400/20 border-slate-300/40 text-slate-100",
+        colsClass: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
+        cards: [
+          { file: "images/3.1.jpg", label: "3.1 Test Plans" },
+          { file: "images/3.2.jpg", label: "3.2 Unit Testing" },
+          { file: "images/3.3.jpg", label: "3.3 E2E Testing" },
+          { file: "images/3.4.jpg", label: "3.4 Agent Hooks" },
+          { file: "images/3.5.jpg", label: "3.5 Debugging" }
+        ]
+      },
+      {
+        week: 4,
+        title: "TYDZIEŃ 04",
+        subtitle: "Refaktoryzacja, Domeny & Skalowanie Kontekstu",
+        borderClass: "from-amber-400/60 via-orange-500/40 to-amber-400/60",
+        badgeHover: "hover:shadow-[0_10px_35px_rgba(245,158,11,0.4)] hover:border-amber-400",
+        accentText: "text-amber-300",
+        tagBg: "bg-amber-500/20 border-amber-400/40 text-amber-200",
+        colsClass: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
+        cards: [
+          { file: "images/4.1.jpg", label: "4.1 Research" },
+          { file: "images/4.2.jpg", label: "4.2 Feature X-Ray" },
+          { file: "images/4.3.jpg", label: "4.3 Refaktoryzacja" },
+          { file: "images/4.4.jpg", label: "4.4 Modernizacja" },
+          { file: "images/4.5.jpg", label: "4.5 Skalowanie kontekstu" }
+        ]
+      },
+      {
+        week: 5,
+        title: "TYDZIEŃ 05",
+        subtitle: "Agent SDK, CI/CD & Autonomiczne Systemy",
+        borderClass: "from-purple-500/70 via-fuchsia-500/50 to-purple-500/70",
+        badgeHover: "hover:shadow-[0_10px_35px_rgba(168,85,247,0.45)] hover:border-purple-400",
+        accentText: "text-purple-300",
+        tagBg: "bg-purple-500/20 border-purple-400/40 text-purple-200",
+        colsClass: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
+        cards: [
+          { file: "images/5.1.jpg", label: "5.1 Agent SDK" },
+          { file: "images/5.2.jpg", label: "5.2 Agentic Code Review" },
+          { file: "images/5.3.jpg", label: "5.3 Infrastruktura AI-Native" },
+          { file: "images/5.4.jpg", label: "5.4 Inner Source" },
+          { file: "images/5.5.jpg", label: "5.5 Async Agents" }
+        ]
+      }
+    ];
+
+    const container = document.getElementById('weeks-container');
+
+    function renderWeeks(filter = 'all') {
+      container.innerHTML = '';
+      const filtered = filter === 'all' ? weeksData : weeksData.filter(w => String(w.week) === String(filter));
+
+      filtered.forEach(w => {
+        const section = document.createElement('section');
+        section.className = `relative p-[1px] bg-gradient-to-r ${w.borderClass} hud-frame shadow-[0_0_40px_rgba(0,0,0,0.6)]`;
+
+        const cardsHtml = w.cards.map(card => `
+          <div onclick="openLightbox('${card.file}')" 
+               class="badge-card group relative rounded-xl overflow-hidden bg-[#090d1a] border border-white/10 ${w.badgeHover} cursor-pointer">
+            <img src="${card.file}" alt="${card.label}" loading="lazy" class="w-full h-auto block" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
+              <span class="px-2.5 py-1 rounded bg-black/80 text-[11px] font-hud tracking-wider text-white border border-white/20">
+                POWIĘKSZ 🔍
+              </span>
+            </div>
+          </div>
+        `).join('');
+
+        section.innerHTML = `
+          <div class="bg-[#090d1c]/92 backdrop-blur-md p-5 sm:p-8 hud-frame">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 mb-6 border-b border-white/10">
+              <div class="flex flex-wrap items-center gap-3">
+                <span class="font-hud text-xl sm:text-2xl font-black tracking-wider ${w.accentText}">
+                  ${w.title}
+                </span>
+                <span class="text-slate-600 hidden sm:inline">//</span>
+                <span class="text-slate-200 font-semibold text-base sm:text-lg">
+                  ${w.subtitle}
+                </span>
+              </div>
+              <span class="self-start sm:self-auto px-3 py-1 rounded-md border text-xs font-hud font-bold tracking-wider ${w.tagBg}">
+                ODZNAKI: ${w.cards.length}
+              </span>
+            </div>
+            <div class="grid ${w.colsClass} gap-4 sm:gap-5">
+              ${cardsHtml}
+            </div>
+          </div>
+        `;
+
+        container.appendChild(section);
+      });
+    }
+
+    // Obsługa filtrowania
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('bg-purple-600', 'text-white', 'border-purple-400', 'shadow-[0_0_15px_rgba(168,85,247,0.5)]');
+          b.classList.add('bg-slate-900/80', 'text-slate-300', 'border-slate-700');
+        });
+        btn.classList.remove('bg-slate-900/80', 'text-slate-300', 'border-slate-700');
+        btn.classList.add('bg-purple-600', 'text-white', 'border-purple-400', 'shadow-[0_0_15px_rgba(168,85,247,0.5)]');
+        renderWeeks(btn.dataset.filter);
+      });
+    });
+
+    // Lightbox
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+
+    function openLightbox(src) {
+      lightboxImg.src = src;
+      lightbox.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    renderWeeks('all');
+  </script>
+</body>
+</html>
