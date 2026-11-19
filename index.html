@@ -60,14 +60,85 @@
       clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 100%, 0% 100%);
     }
 
-    /* Efekt poświaty i unoszenia karty */
+    /* Holograficzna karta: pochylenie 3D za kursorem, odblask, smuga światła i neonowa poświata */
     .badge-card {
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+      --glow: 168, 85, 247;
+      --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%; --sx: 0px; --sy: 0px;
+      --lift: 0px; --scale: 1;
+      transform: perspective(1000px) translateY(var(--lift)) scale(var(--scale)) rotateX(var(--rx)) rotateY(var(--ry));
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+      will-change: transform;
+    }
+
+    .badge-card.is-tilting {
+      transition: transform 0.12s ease-out, box-shadow 0.4s ease, border-color 0.4s ease;
     }
 
     .badge-card:hover {
-      transform: translateY(-8px) scale(1.03);
+      --lift: -12px; --scale: 1.06;
       z-index: 20;
+      border-color: rgba(var(--glow), 0.9);
+      box-shadow:
+        var(--sx) calc(var(--sy) + 28px) 45px -12px rgba(0, 0, 0, 0.85),
+        0 0 28px rgba(var(--glow), 0.55),
+        0 0 70px rgba(var(--glow), 0.28);
+    }
+
+    /* Tęczowa warstwa holograficzna + punktowy odblask w miejscu kursora */
+    .badge-holo {
+      position: absolute; inset: 0; pointer-events: none; opacity: 0;
+      background:
+        radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 22%, transparent 48%),
+        linear-gradient(115deg, transparent 18%, rgba(255, 0, 170, 0.32) 34%, rgba(0, 229, 255, 0.32) 46%, rgba(255, 230, 0, 0.28) 58%, rgba(var(--glow), 0.3) 70%, transparent 84%);
+      background-size: 100% 100%, 260% 260%;
+      background-position: center, var(--mx) var(--my);
+      mix-blend-mode: color-dodge;
+      transition: opacity 0.35s ease;
+    }
+
+    .badge-card:hover .badge-holo { opacity: 0.55; }
+
+    /* Jednorazowa smuga światła przelatująca przez kartę przy najechaniu */
+    .badge-shine {
+      position: absolute; inset: -20%; pointer-events: none;
+      background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.6) 50%, transparent 58%);
+      transform: translateX(-110%);
+    }
+
+    .badge-card:hover .badge-shine { animation: badgeShine 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1; }
+
+    @keyframes badgeShine {
+      from { transform: translateX(-110%); }
+      to   { transform: translateX(110%); }
+    }
+
+    /* Powiększona odznaka w lightboxie: stała poświata, bez unoszenia, wejście z obrotu 3D */
+    .holo-lightbox {
+      border-color: rgba(var(--glow), 0.75);
+      box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.9), 0 0 45px rgba(var(--glow), 0.45), 0 0 110px rgba(var(--glow), 0.2);
+    }
+
+    .holo-lightbox:hover { --lift: 0px; --scale: 1; }
+
+    .holo-lightbox.is-entering {
+      animation: holoEnter 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .holo-lightbox.is-entering .badge-shine {
+      animation: badgeShine 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s 1 both;
+    }
+
+    @keyframes holoEnter {
+      0%   { transform: perspective(1000px) rotateY(-75deg) rotateX(12deg) scale(0.6); opacity: 0; filter: brightness(2.2) saturate(1.6); }
+      55%  { transform: perspective(1000px) rotateY(9deg) rotateX(-2deg) scale(1.03); opacity: 1; filter: brightness(1.25); }
+      100% { transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1); opacity: 1; filter: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .badge-card, .badge-card.is-tilting { transition: box-shadow 0.4s ease, border-color 0.4s ease; }
+      .badge-card:hover { --lift: 0px; --scale: 1; }
+      .badge-card:hover .badge-shine { animation: none; }
+      .holo-lightbox.is-entering, .holo-lightbox.is-entering .badge-shine { animation: none; }
     }
 
     /* Wyróżnienia kursu w sekcji certyfikatu */
@@ -407,7 +478,11 @@
       <button onclick="closeLightbox()" class="absolute -top-12 right-0 px-4 py-1.5 bg-slate-800/90 hover:bg-purple-600 text-white font-hud text-xs tracking-wider rounded-lg border border-slate-600 transition cursor-pointer">
         ZAMKNIJ [ESC]
       </button>
-      <img id="lightbox-img" src="" alt="Powiększona odznaka" class="w-full h-auto rounded-2xl border-2 border-purple-400/70 shadow-[0_0_50px_rgba(168,85,247,0.4)]" />
+      <div id="lightbox-card" class="badge-card holo-lightbox relative rounded-2xl overflow-hidden border-2 border-white/10">
+        <img id="lightbox-img" src="" alt="Powiększona odznaka" class="w-full h-auto block" />
+        <div class="badge-holo"></div>
+        <div class="badge-shine"></div>
+      </div>
     </div>
   </div>
 
@@ -572,10 +647,15 @@
         const section = document.createElement('section');
         section.className = `relative p-[1px] bg-gradient-to-r ${w.borderClass} hud-frame shadow-[0_0_40px_rgba(0,0,0,0.6)]`;
 
+        // Kolor poświaty tygodnia, np. "56,189,248" z definicji badgeHover
+        const glow = (w.badgeHover.match(/rgba\((\d+,\s*\d+,\s*\d+)/) || [])[1] || '168,85,247';
+
         const cardsHtml = w.cards.map(card => `
-          <div onclick="openLightbox('${card.file}', '${thumbOf(card.file)}')"
-               class="badge-card group relative rounded-xl overflow-hidden bg-[#090d1a] border border-white/10 ${w.badgeHover} cursor-pointer">
+          <div onclick="openLightbox('${card.file}', '${thumbOf(card.file)}', false, this)" style="--glow: ${glow}"
+               class="badge-card group relative rounded-xl overflow-hidden bg-[#090d1a] border border-white/10 cursor-pointer">
             <img src="${thumbOf(card.file)}" alt="${card.label}" width="480" height="767" loading="lazy" decoding="async" class="w-full h-auto block" />
+            <div class="badge-holo"></div>
+            <div class="badge-shine"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
               <span class="px-2.5 py-1 rounded bg-black/80 text-[11px] font-hud tracking-wider text-white border border-white/20">
                 POWIĘKSZ 🔍
@@ -623,16 +703,61 @@
       });
     });
 
+    // Pochylenie 3D odznak za kursorem (tylko mysz, z poszanowaniem ograniczenia animacji)
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const MAX_TILT = 14;
+
+    document.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const card = e.target.closest('.badge-card');
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;   // 0..1
+      const py = (e.clientY - r.top) / r.height;   // 0..1
+      card.style.setProperty('--mx', `${px * 100}%`);
+      card.style.setProperty('--my', `${py * 100}%`);
+      if (reduceMotion.matches) return;
+      const tilt = parseFloat(card.style.getPropertyValue('--tilt-max')) || MAX_TILT;
+      card.classList.add('is-tilting');
+      card.style.setProperty('--ry', `${(px - 0.5) * 2 * tilt}deg`);
+      card.style.setProperty('--rx', `${(0.5 - py) * 2 * tilt}deg`);
+      // Cień odsuwa się od kursora, jakby światło padało z jego strony
+      card.style.setProperty('--sx', `${(0.5 - px) * 30}px`);
+      card.style.setProperty('--sy', `${(0.5 - py) * 20}px`);
+    });
+
+    document.addEventListener('pointerout', (e) => {
+      const card = e.target.closest('.badge-card');
+      if (!card || card.contains(e.relatedTarget)) return;
+      card.classList.remove('is-tilting');
+      ['--rx', '--ry', '--mx', '--my', '--sx', '--sy'].forEach(p => card.style.removeProperty(p));
+    });
+
     // Lightbox dla odznak
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
 
     const lightboxFrame = document.getElementById('lightbox-frame');
 
-    function openLightbox(src, thumb, wide = false) {
+    const lightboxCard = document.getElementById('lightbox-card');
+
+    // Po smudze światła z wejścia oddajemy kartę zwykłym efektom najechania
+    lightboxCard.addEventListener('animationend', (e) => {
+      if (e.animationName === 'badgeShine') lightboxCard.classList.remove('is-entering');
+    });
+
+    function openLightbox(src, thumb, wide = false, origin = null) {
       // Szerokie grafiki (16:9) dostają szersze okno niż pionowe odznaki
       lightboxFrame.classList.toggle('max-w-lg', !wide);
       lightboxFrame.classList.toggle('max-w-6xl', wide);
+      // Powiększona karta przejmuje kolor poświaty tygodnia, z którego ją otwarto
+      const glow = origin ? getComputedStyle(origin).getPropertyValue('--glow').trim() : '';
+      lightboxCard.style.setProperty('--glow', glow || '168, 85, 247');
+      lightboxCard.style.setProperty('--tilt-max', wide ? 5 : 9);
+      // Wejście z obrotu 3D, za każdym razem od nowa
+      lightboxCard.classList.remove('is-entering');
+      void lightboxCard.offsetWidth;
+      lightboxCard.classList.add('is-entering');
       // Najpierw miniatura (jest już w cache), potem podmiana na pełną rozdzielczość
       lightboxImg.src = thumb || src;
       const full = new Image();
@@ -644,6 +769,8 @@
 
     function closeLightbox() {
       lightbox.classList.add('hidden');
+      lightboxCard.classList.remove('is-tilting', 'is-entering');
+      ['--rx', '--ry', '--mx', '--my', '--sx', '--sy'].forEach(p => lightboxCard.style.removeProperty(p));
       document.body.style.overflow = '';
     }
 
