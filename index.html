@@ -234,6 +234,33 @@
       .profile-wrap { --ring-angle: 200deg; }
     }
 
+    /* Wyeksponowany przycisk podglądu certyfikatu */
+    .cert-cta {
+      background: linear-gradient(90deg, #a855f7, #38bdf8, #22d3ee, #fbbf24, #a855f7);
+      background-size: 300% 100%;
+      animation: ctaBorder 6s linear infinite, ctaGlow 2.6s ease-in-out infinite;
+    }
+    .cert-cta-inner { position: relative; overflow: hidden; }
+    .cert-cta-inner::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,0.18) 50%, transparent 65%);
+      transform: translateX(-120%);
+      animation: ctaShine 3.2s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .cert-cta:hover { transform: translateY(-2px) scale(1.03); }
+    .cert-cta:hover .cta-arrow { transform: translateX(4px); }
+    @keyframes ctaBorder { to { background-position: 300% 0; } }
+    @keyframes ctaGlow {
+      0%, 100% { box-shadow: 0 0 18px rgba(168, 85, 247, 0.45), 0 0 0 0 rgba(34, 211, 238, 0); }
+      50%      { box-shadow: 0 0 36px rgba(34, 211, 238, 0.65), 0 0 0 6px rgba(34, 211, 238, 0.12); }
+    }
+    @keyframes ctaShine { 0%, 55% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+    @media (prefers-reduced-motion: reduce) {
+      .cert-cta, .cert-cta-inner::after { animation: none; }
+      .cert-cta:hover { transform: none; }
+    }
+
     /* Scena 3D dla certyfikatu */
     .cert-3d-stage {
       perspective: 1400px;
@@ -973,22 +1000,21 @@
 
         <!-- Przyciski akcji -->
         <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto shrink-0">
-          <button onclick="openCertModal()" 
-                  class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-hud text-xs font-black uppercase tracking-wider shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] transition cursor-pointer">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            Podgląd certyfikatu 3D
+          <button onclick="openCertModal()"
+                  class="cert-cta group relative flex-1 sm:flex-initial inline-flex p-[2px] rounded-2xl transition-transform duration-300 cursor-pointer">
+            <span class="cert-cta-inner w-full inline-flex items-center justify-center gap-3 px-7 py-4 rounded-[14px] bg-slate-950 group-hover:bg-slate-800 text-slate-50 font-hud text-sm font-black uppercase tracking-wider transition">
+              <span class="inline-flex w-8 h-8 items-center justify-center rounded-lg bg-cyan-400/15 border border-cyan-400/40">
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </span>
+              Podgląd certyfikatu 3D
+              <svg class="cta-arrow w-4 h-4 text-cyan-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M13 7l5 5-5 5M6 12h12" />
+              </svg>
+            </span>
           </button>
-
-          <a href="images/10xDevs_certificate_aturewicz.jpg" download="10xDevs_certificate_aturewicz.jpg"
-             class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-purple-400 font-hud text-xs font-bold uppercase tracking-wider transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Pobierz
-          </a>
         </div>
 
       </div>
