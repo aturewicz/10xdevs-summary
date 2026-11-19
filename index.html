@@ -151,13 +151,75 @@
       filter: brightness(1.12);
     }
 
-    /* Animacja paska skanowania na profilu */
-    @keyframes scanline {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(400%); }
+    /* ===== Zdjęcie profilowe: obracająca się neonowa ramka, aura i narożniki celownika ===== */
+    @property --ring-angle {
+      syntax: '<angle>';
+      inherits: true;
+      initial-value: 0deg;
     }
-    .animate-scan {
-      animation: scanline 4s linear infinite;
+
+    .profile-wrap {
+      --ring-angle: 0deg;
+      animation: ringSpin 6s linear infinite;
+    }
+
+    @keyframes ringSpin {
+      to { --ring-angle: 360deg; }
+    }
+
+    /* Jasny łuk światła krążący po ramce, na tle przygaszonej stałej obwódki */
+    .profile-ring {
+      padding: 4px;
+      border-radius: 1.1rem;
+      background:
+        conic-gradient(from var(--ring-angle), transparent 0% 52%, #22d3ee 66%, #a855f7 80%, #f59e0b 90%, transparent 100%),
+        linear-gradient(135deg, rgba(34, 211, 238, 0.35), rgba(168, 85, 247, 0.35));
+    }
+
+    .profile-ring > .profile-inner { border-radius: calc(1.1rem - 4px); }
+
+    /* Rozmyta aura za kartą, podąża za łukiem i delikatnie „oddycha” */
+    .profile-aura {
+      position: absolute;
+      inset: -20px;
+      border-radius: 1.8rem;
+      background: conic-gradient(from var(--ring-angle), transparent 0% 45%, rgba(34, 211, 238, 0.9) 62%, rgba(168, 85, 247, 0.9) 78%, rgba(245, 158, 11, 0.8) 90%, transparent 100%);
+      filter: blur(30px);
+      opacity: 0.7;
+      animation: auraBreath 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes auraBreath {
+      0%, 100% { opacity: 0.55; transform: scale(0.98); }
+      50%      { opacity: 0.95; transform: scale(1.04); }
+    }
+
+    /* Narożniki celownika HUD, pulsujące na zewnątrz */
+    .hud-corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border: 0 solid #67e8f9;
+      filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.9));
+      pointer-events: none;
+      z-index: 20;
+      animation: cornerLock 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    }
+
+    .hud-corner.tl { top: -12px; left: -12px; border-top-width: 3px; border-left-width: 3px; border-top-left-radius: 6px; --dx: -6px; --dy: -6px; }
+    .hud-corner.tr { top: -12px; right: -12px; border-top-width: 3px; border-right-width: 3px; border-top-right-radius: 6px; --dx: 6px; --dy: -6px; }
+    .hud-corner.bl { bottom: -12px; left: -12px; border-bottom-width: 3px; border-left-width: 3px; border-bottom-left-radius: 6px; --dx: -6px; --dy: 6px; }
+    .hud-corner.br { bottom: -12px; right: -12px; border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 6px; --dx: 6px; --dy: 6px; }
+
+    @keyframes cornerLock {
+      0%, 100% { transform: translate(0, 0); opacity: 1; }
+      50%      { transform: translate(var(--dx), var(--dy)); opacity: 0.55; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .profile-wrap, .profile-aura, .hud-corner { animation: none; }
+      .profile-wrap { --ring-angle: 200deg; }
     }
 
     /* Scena 3D dla certyfikatu */
@@ -363,9 +425,18 @@
           
           <!-- Lewa kolumna: Oryginalne zdjęcie profilowe -->
           <div class="lg:col-span-5 xl:col-span-4 flex justify-center">
-            <div class="relative group w-full max-w-[400px] rounded-2xl overflow-hidden border-2 border-cyan-400/50 shadow-[0_0_40px_rgba(6,182,212,0.25)]">
-              <img src="images/profil.webp" width="800" height="800" fetchpriority="high" decoding="async" alt="Profil 10xDEVS" class="w-full h-auto block object-cover transition duration-500 group-hover:scale-[1.02]" />
-              <div class="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-cyan-400/20 to-transparent pointer-events-none animate-scan"></div>
+            <div class="profile-wrap relative w-full max-w-[400px]">
+              <div class="profile-aura"></div>
+              <!-- Ramka z krążącym łukiem; pochyla się 3D za kursorem jak odznaki (klasa badge-card) -->
+              <div class="badge-card profile-ring relative" style="--glow: 34, 211, 238; --tilt-max: 9">
+                <div class="profile-inner relative overflow-hidden bg-[#0a0e1d]">
+                  <img src="images/profil.webp" width="800" height="800" fetchpriority="high" decoding="async" alt="Profil 10xDEVS" class="w-full h-auto block object-cover" />
+                  <div class="badge-holo"></div>
+                  <div class="badge-shine"></div>
+                </div>
+              </div>
+              <span class="hud-corner tl"></span><span class="hud-corner tr"></span>
+              <span class="hud-corner bl"></span><span class="hud-corner br"></span>
             </div>
           </div>
 
