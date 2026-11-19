@@ -70,6 +70,16 @@
       z-index: 20;
     }
 
+    /* Wyróżnienia kursu w sekcji certyfikatu */
+    .award-badge {
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease;
+    }
+
+    .award-badge:hover {
+      transform: translateY(-6px) scale(1.08) rotate(-2deg);
+      filter: brightness(1.12);
+    }
+
     /* Animacja paska skanowania na profilu */
     @keyframes scanline {
       0% { transform: translateY(-100%); }
@@ -254,8 +264,9 @@
 
     <!-- SEKCJA CERTYFIKATU UKOŃCZENIA -->
     <section aria-labelledby="certificate-heading" class="relative p-[1px] bg-gradient-to-r from-amber-400/60 via-purple-500/60 to-cyan-400/60 hud-frame shadow-[0_0_50px_rgba(245,158,11,0.15)]">
-      <div class="bg-[#0a0e1d]/92 backdrop-blur-xl p-6 sm:p-8 hud-frame flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-        
+      <div class="bg-[#0a0e1d]/92 backdrop-blur-xl p-6 sm:p-8 hud-frame space-y-6">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+
         <div class="flex items-start sm:items-center gap-5">
           <!-- Ikona odznaki / certyfikatu -->
           <div class="hidden sm:flex shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-purple-600/20 border border-amber-400/50 items-center justify-center shadow-[0_0_25px_rgba(245,158,11,0.2)]">
@@ -301,6 +312,30 @@
             Pobierz
           </a>
         </div>
+
+      </div>
+
+      <!-- Wyróżnienia zdobyte w kursie -->
+      <div class="pt-6 border-t border-white/20 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+        <div class="space-y-1.5 lg:pl-[84px]">
+          <span class="inline-block px-2.5 py-0.5 text-[11px] font-hud font-bold tracking-widest uppercase bg-black/40 text-white border border-white/30 rounded">
+            Wyróżnienia kursu // 4 / 4
+          </span>
+          <p class="font-hud text-lg sm:text-xl font-black tracking-wide text-white">
+            BUILDER • ARCHITECT • CHAMPION • BEST PROJECT
+          </p>
+        </div>
+        <ul class="grid grid-cols-4 gap-2 sm:gap-4 w-full lg:w-auto" aria-label="Zdobyte wyróżnienia kursu">
+          <li><img src="images/awards/builder.webp" width="197" height="191" loading="lazy" decoding="async" alt="10x Builder" title="10x Builder"
+                   class="award-badge w-full lg:w-[118px] h-auto drop-shadow-[0_6px_18px_rgba(56,189,248,0.55)]" /></li>
+          <li><img src="images/awards/architect.webp" width="197" height="193" loading="lazy" decoding="async" alt="10x Architect" title="10x Architect"
+                   class="award-badge w-full lg:w-[118px] h-auto drop-shadow-[0_6px_18px_rgba(168,85,247,0.6)]" /></li>
+          <li><img src="images/awards/champion.webp" width="198" height="194" loading="lazy" decoding="async" alt="10x Champion" title="10x Champion"
+                   class="award-badge w-full lg:w-[118px] h-auto drop-shadow-[0_6px_18px_rgba(249,115,22,0.6)]" /></li>
+          <li><img src="images/awards/best-project.webp" width="195" height="185" loading="lazy" decoding="async" alt="Best Project" title="Best Project"
+                   class="award-badge w-full lg:w-[118px] h-auto drop-shadow-[0_6px_22px_rgba(250,204,21,0.7)]" /></li>
+        </ul>
+      </div>
 
       </div>
     </section>
