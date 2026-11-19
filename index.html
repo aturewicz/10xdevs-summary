@@ -6,6 +6,7 @@
   <title>10xDEVS 4.0 — Podsumowanie Misji</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2306b6d4'/%3E%3Cstop offset='50%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%23f59e0b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpolygon points='32,3 58,18 58,46 32,61 6,46 6,18' fill='%230a0e1d' stroke='url(%23g)' stroke-width='4'/%3E%3Ctext x='32' y='38' font-family='sans-serif' font-weight='900' font-size='20' fill='%23ffffff' text-anchor='middle' letter-spacing='-1'%3E10x%3C/text%3E%3C/svg%3E" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -76,6 +77,81 @@
     }
     .animate-scan {
       animation: scanline 4s linear infinite;
+    }
+
+    /* Scena 3D dla certyfikatu */
+    .cert-3d-stage {
+      perspective: 1400px;
+    }
+
+    .cert-3d-card {
+      transform-style: preserve-3d;
+      transition: transform 0.14s ease-out, box-shadow 0.25s ease;
+      will-change: transform;
+    }
+
+    .cert-3d-card.is-entering {
+      animation: cert3dEntrance 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .cert-3d-card.is-spinning {
+      animation: cert3dSpin 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes cert3dEntrance {
+      0% {
+        opacity: 0;
+        transform: perspective(1400px) rotateY(-42deg) rotateX(18deg) rotateZ(-4deg) scale(0.72) translateY(40px);
+      }
+      55% {
+        opacity: 1;
+        transform: perspective(1400px) rotateY(10deg) rotateX(-5deg) rotateZ(1deg) scale(1.03) translateY(-6px);
+      }
+      100% {
+        opacity: 1;
+        transform: perspective(1400px) rotateY(0deg) rotateX(0deg) rotateZ(0deg) scale(1) translateY(0);
+      }
+    }
+
+    @keyframes cert3dSpin {
+      0% {
+        transform: perspective(1400px) rotateY(0deg) rotateX(0deg) scale(1);
+      }
+      45% {
+        transform: perspective(1400px) rotateY(195deg) rotateX(10deg) scale(1.05);
+      }
+      100% {
+        transform: perspective(1400px) rotateY(360deg) rotateX(0deg) scale(1);
+      }
+    }
+
+    /* Holograficzny połysk podążający za kursorem */
+    .cert-holo-glare {
+      background: radial-gradient(
+        circle at var(--glare-x, 50%) var(--glare-y, 50%),
+        rgba(255, 255, 255, 0.28) 0%,
+        rgba(6, 182, 212, 0.16) 25%,
+        rgba(168, 85, 247, 0.12) 48%,
+        transparent 72%
+      );
+      mix-blend-mode: screen;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Cząsteczki ambientowe w tle modalu */
+    @keyframes floatSparkle {
+      0%, 100% {
+        transform: translateY(0px) scale(1);
+        opacity: 0.35;
+      }
+      50% {
+        transform: translateY(-18px) scale(1.35);
+        opacity: 0.95;
+      }
+    }
+    .sparkle-dot {
+      animation: floatSparkle var(--dur, 3s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
     }
   </style>
 </head>
@@ -176,7 +252,7 @@
       </div>
     </header>
 
-    <!-- SEKCJA CERTYFIKATU UKOŃCZENIA (PNG) -->
+    <!-- SEKCJA CERTYFIKATU UKOŃCZENIA -->
     <section aria-labelledby="certificate-heading" class="relative p-[1px] bg-gradient-to-r from-amber-400/60 via-purple-500/60 to-cyan-400/60 hud-frame shadow-[0_0_50px_rgba(245,158,11,0.15)]">
       <div class="bg-[#0a0e1d]/92 backdrop-blur-xl p-6 sm:p-8 hud-frame flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         
@@ -191,7 +267,7 @@
           <div class="space-y-1.5">
             <div class="flex flex-wrap items-center gap-2">
               <span class="px-2.5 py-0.5 text-[11px] font-hud font-bold tracking-widest uppercase bg-amber-500/15 text-amber-300 border border-amber-400/40 rounded">
-                DOKUMENT WERYFIKACYJNY // PNG
+                DOKUMENT WERYFIKACYJNY // 3D INTERACTIVE
               </span>
               <span class="text-xs font-hud text-slate-400 tracking-wider">
                 EDYCJA 4.0 (14.09 – 18.10.2026)
@@ -206,15 +282,15 @@
           </div>
         </div>
 
-        <!-- Przyciski akcji PNG -->
+        <!-- Przyciski akcji -->
         <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto shrink-0">
           <button onclick="openCertModal()" 
-                  class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-hud text-xs font-black uppercase tracking-wider shadow-[0_0_25px_rgba(245,158,11,0.35)] transition cursor-pointer">
+                  class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-hud text-xs font-black uppercase tracking-wider shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] transition cursor-pointer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            Podgląd certyfikatu
+            Podgląd certyfikatu 3D
           </button>
 
           <a href="images/10xDevs_certificate_aturewicz.jpg" target="_blank" rel="noopener noreferrer"
@@ -261,27 +337,60 @@
     </div>
   </div>
 
-  <!-- MODAL PODGLĄDU CERTYFIKATU PNG -->
-  <div id="cert-modal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6" onclick="closeCertModal()">
-    <div class="relative w-full max-w-5xl max-h-[90vh] bg-[#0a0e1d] rounded-2xl border-2 border-amber-400/60 shadow-[0_0_60px_rgba(245,158,11,0.3)] flex flex-col overflow-hidden" onclick="event.stopPropagation()">
-      <div class="flex items-center justify-between px-5 py-3.5 bg-[#11172e] border-b border-white/10 shrink-0">
+  <!-- MODAL INTERAKTYWNEGO PODGLĄDU CERTYFIKATU 3D -->
+  <div id="cert-modal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6" onclick="closeCertModal()">
+    
+    <!-- Unoszące się w tle cząsteczki świetlne -->
+    <div id="cert-ambient-particles" class="pointer-events-none fixed inset-0 overflow-hidden"></div>
+
+    <div class="relative z-10 w-full max-w-5xl max-h-[92vh] bg-[#0a0e1d]/95 rounded-2xl border-2 border-amber-400/60 shadow-[0_0_80px_rgba(245,158,11,0.3)] flex flex-col overflow-hidden" onclick="event.stopPropagation()">
+      
+      <!-- Górny pasek modalu -->
+      <div class="flex flex-wrap items-center justify-between gap-2 px-4 sm:px-5 py-3.5 bg-[#11172e] border-b border-white/10 shrink-0">
         <div class="flex items-center gap-2.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
           <span class="font-hud text-xs sm:text-sm font-bold tracking-wider text-white">CERTYFIKAT UKOŃCZENIA // 10xDEVS 4.0</span>
         </div>
         <div class="flex items-center gap-2">
+          <button onclick="triggerCelebration(true)" 
+                  class="px-3 py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/50 rounded-lg font-hud text-xs font-bold tracking-wider transition cursor-pointer">
+            ✨ OBRÓT 3D + KONFETTI
+          </button>
           <a href="images/10xDevs_certificate_aturewicz.jpg" download="10xDevs_certificate_aturewicz.jpg"
              class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 rounded-lg font-hud text-xs font-bold tracking-wider transition">
-            POBIERZ PNG
+            POBIERZ JPG
           </a>
-          <button onclick="closeCertModal()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-purple-600 text-white font-hud text-xs font-bold tracking-wider rounded-lg border border-slate-600 transition cursor-pointer">
+          <button onclick="closeCertModal()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-rose-600/80 text-white font-hud text-xs font-bold tracking-wider rounded-lg border border-slate-600 transition cursor-pointer">
             ZAMKNIJ [ESC]
           </button>
         </div>
       </div>
-      <div class="flex-1 bg-slate-950 overflow-auto p-4 sm:p-6 flex items-center justify-center">
-        <img src="images/10xDevs_certificate_aturewicz.jpg" alt="Certyfikat ukończenia 10xDEVS 4.0" class="max-w-full max-h-[75vh] w-auto h-auto rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/10" />
+
+      <!-- Scena 3D z interaktywnym pochyleniem -->
+      <div id="cert-stage" class="cert-3d-stage relative flex-1 bg-radial from-slate-900 via-slate-950 to-black overflow-hidden p-4 sm:p-8 flex flex-col items-center justify-center select-none">
+        
+        <!-- Poświata za kartą -->
+        <div class="pointer-events-none absolute w-[70%] h-[70%] rounded-full bg-gradient-to-tr from-amber-500/20 via-purple-500/20 to-cyan-400/20 blur-3xl"></div>
+
+        <!-- Karta certyfikatu 3D -->
+        <div id="cert-3d-card" class="cert-3d-card relative rounded-xl overflow-hidden border-2 border-amber-300/70 shadow-[0_25px_70px_rgba(0,0,0,0.85),0_0_40px_rgba(245,158,11,0.3)] cursor-grab active:cursor-grabbing">
+          <img src="images/10xDevs_certificate_aturewicz.jpg" 
+               alt="Certyfikat ukończenia 10xDEVS 4.0" 
+               draggable="false"
+               class="max-w-full max-h-[68vh] w-auto h-auto block pointer-events-none" />
+          
+          <!-- Warstwa holograficzna -->
+          <div id="cert-holo" class="cert-holo-glare pointer-events-none absolute inset-0 opacity-0"></div>
+          
+          <!-- Ramka wewnętrzna HUD -->
+          <div class="pointer-events-none absolute inset-0 border border-white/15 rounded-xl"></div>
+        </div>
+
+        <p class="mt-4 text-[11px] sm:text-xs font-hud tracking-widest text-slate-400 uppercase text-center">
+          Poruszaj kursorem po certyfikacie, aby zmieniać kąt 3D • Kliknij certyfikat po więcej iskier
+        </p>
       </div>
+
     </div>
   </div>
 
@@ -451,18 +560,163 @@
       document.body.style.overflow = '';
     }
 
-    // Modal dla certyfikatu PNG
+    // ==========================================
+    // INTERAKTYWNY CERTYFIKAT 3D + KONFETTI
+    // ==========================================
     const certModal = document.getElementById('cert-modal');
+    const certStage = document.getElementById('cert-stage');
+    const certCard = document.getElementById('cert-3d-card');
+    const certHolo = document.getElementById('cert-holo');
+    const ambientContainer = document.getElementById('cert-ambient-particles');
+
+    // Generowanie unoszących się iskierek w tle modalu
+    function buildAmbientParticles() {
+      if (ambientContainer.children.length > 0) return;
+      const colors = ['#f59e0b', '#06b6d4', '#a855f7', '#ffffff'];
+      for (let i = 0; i < 36; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'sparkle-dot absolute rounded-full';
+        const size = Math.random() * 4 + 2;
+        dot.style.width = `${size}px`;
+        dot.style.height = `${size}px`;
+        dot.style.left = `${Math.random() * 100}%`;
+        dot.style.top = `${Math.random() * 100}%`;
+        dot.style.backgroundColor = colors[i % colors.length];
+        dot.style.boxShadow = `0 0 ${size * 3}px ${colors[i % colors.length]}`;
+        dot.style.setProperty('--dur', `${(Math.random() * 2.5 + 2).toFixed(2)}s`);
+        dot.style.setProperty('--delay', `${(Math.random() * 2).toFixed(2)}s`);
+        ambientContainer.appendChild(dot);
+      }
+    }
+
+    // Wystrzał konfetti w barwach 10xDEVS (złoto, cyjan, fiolet)
+    function fireConfettiBurst() {
+      if (typeof confetti !== 'function') return;
+      const palette = ['#f59e0b', '#fbbf24', '#06b6d4', '#a855f7', '#ffffff'];
+
+      // Centralny wybuch
+      confetti({
+        particleCount: 80,
+        spread: 75,
+        origin: { y: 0.55 },
+        colors: palette,
+        zIndex: 9999
+      });
+
+      // Salwy boczne
+      setTimeout(() => {
+        confetti({
+          particleCount: 45,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0.1, y: 0.65 },
+          colors: palette,
+          zIndex: 9999
+        });
+        confetti({
+          particleCount: 45,
+          angle: 120,
+          spread: 55,
+          origin: { x: 0.9, y: 0.65 },
+          colors: palette,
+          zIndex: 9999
+        });
+      }, 220);
+    }
+
+    function triggerCelebration(withSpin = false) {
+      fireConfettiBurst();
+      if (withSpin) {
+        certCard.style.transform = '';
+        certCard.classList.remove('is-entering', 'is-spinning');
+        void certCard.offsetWidth; // reset animacji CSS
+        certCard.classList.add('is-spinning');
+      }
+    }
 
     function openCertModal() {
+      buildAmbientParticles();
       certModal.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
+
+      // Reset transformacji i odpalenie wejścia 3D
+      certCard.style.transform = '';
+      certCard.classList.remove('is-entering', 'is-spinning');
+      void certCard.offsetWidth;
+      certCard.classList.add('is-entering');
+
+      fireConfettiBurst();
     }
 
     function closeCertModal() {
       certModal.classList.add('hidden');
       document.body.style.overflow = '';
+      certCard.style.transform = '';
+      certHolo.style.opacity = '0';
     }
+
+    // Dynamiczna zmiana kąta 3D w zależności od pozycji kursora / palca
+    function handle3DTilt(clientX, clientY) {
+      if (certCard.classList.contains('is-spinning')) return;
+      certCard.classList.remove('is-entering');
+
+      const rect = certCard.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const maxTilt = 14; // maksymalny kąt obrotu w stopniach
+      const rotateY = ((x - centerX) / centerX) * maxTilt;
+      const rotateX = -((y - centerY) / centerY) * maxTilt;
+
+      certCard.style.transform = `perspective(1400px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.025, 1.025, 1.025)`;
+
+      // Pozycja holograficznego odblasku
+      const percentX = (x / rect.width) * 100;
+      const percentY = (y / rect.height) * 100;
+      certHolo.style.setProperty('--glare-x', `${percentX}%`);
+      certHolo.style.setProperty('--glare-y', `${percentY}%`);
+      certHolo.style.opacity = '1';
+    }
+
+    function reset3DTilt() {
+      if (certCard.classList.contains('is-spinning')) return;
+      certCard.style.transform = 'perspective(1400px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      certHolo.style.opacity = '0';
+    }
+
+    certCard.addEventListener('mousemove', (e) => handle3DTilt(e.clientX, e.clientY));
+    certCard.addEventListener('mouseleave', reset3DTilt);
+    certCard.addEventListener('click', (e) => {
+      // Mały wybuch konfetti w miejscu kliknięcia certyfikatu
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 35,
+          spread: 60,
+          origin: {
+            x: e.clientX / window.innerWidth,
+            y: e.clientY / window.innerHeight
+          },
+          colors: ['#f59e0b', '#06b6d4', '#a855f7', '#ffffff'],
+          zIndex: 9999
+        });
+      }
+    });
+
+    // Obsługa dotyku na urządzeniach mobilnych
+    certCard.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        handle3DTilt(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+    certCard.addEventListener('touchend', reset3DTilt);
+
+    // Czyszczenie klasy po zakończeniu obrotu 360°
+    certCard.addEventListener('animationend', () => {
+      certCard.classList.remove('is-entering', 'is-spinning');
+    });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
