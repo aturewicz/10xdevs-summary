@@ -235,6 +235,89 @@
       animation-delay: var(--delay, 0s);
     }
 
+    /* ===== Nawigacja po sekcjach ===== */
+    html { scroll-behavior: smooth; }
+
+    .nav-target { scroll-margin-top: 96px; }
+
+    .nav-pill {
+      --pill: 168, 85, 247;
+      flex: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgb(51, 65, 85);
+      background: rgba(15, 23, 42, 0.8);
+      color: rgb(203, 213, 225);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: color 0.25s, border-color 0.25s, background-color 0.25s, box-shadow 0.25s;
+    }
+
+    .nav-pill:hover,
+    .nav-pill:focus-visible {
+      color: #fff;
+      border-color: rgba(var(--pill), 0.8);
+      outline: none;
+    }
+
+    .nav-pill.is-active {
+      color: #fff;
+      border-color: rgb(var(--pill));
+      background: rgba(var(--pill), 0.28);
+      box-shadow: 0 0 16px rgba(var(--pill), 0.55), inset 0 0 12px rgba(var(--pill), 0.25);
+    }
+
+    /* Przypięty pasek, wjeżdża z góry po przewinięciu nagłówka */
+    #sticky-nav {
+      transform: translate(-50%, -140%);
+      opacity: 0;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+    }
+
+    #sticky-nav.is-visible {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    #sticky-nav .nav-scroll { scrollbar-width: none; }
+    #sticky-nav .nav-scroll::-webkit-scrollbar { display: none; }
+
+    /* Rozbłysk sekcji po dojechaniu: pulsujące rozjaśnienie i smuga światła w kolorze sekcji */
+    .nav-target.is-flashing {
+      animation: sectionPulse 1.1s ease-out;
+    }
+
+    .nav-target.is-flashing::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      background: linear-gradient(100deg, transparent 30%, rgba(var(--flash), 0.35) 50%, transparent 70%);
+      animation: sectionSweep 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes sectionPulse {
+      0%   { filter: brightness(1); }
+      25%  { filter: brightness(1.35) saturate(1.2); }
+      100% { filter: brightness(1); }
+    }
+
+    @keyframes sectionSweep {
+      from { transform: translateX(-100%); opacity: 1; }
+      to   { transform: translateX(100%); opacity: 0.4; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      #sticky-nav { transition: opacity 0.2s ease; }
+      .nav-target.is-flashing, .nav-target.is-flashing::after { animation: none; }
+    }
+
     /* Migoczące gwiazdki wokół powiększonej odznaki */
     .lb-star {
       position: absolute;
@@ -262,6 +345,13 @@
   </style>
 </head>
 <body class="space-bg min-h-screen antialiased selection:bg-purple-500 selection:text-white">
+
+  <!-- PRZYPIĘTY PASEK NAWIGACJI (pojawia się po przewinięciu nagłówka; przyciski kopiowane z #section-nav) -->
+  <div id="sticky-nav" class="fixed top-3 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-fit" aria-hidden="true">
+    <div class="rounded-2xl p-[1px] bg-gradient-to-r from-cyan-400/50 via-purple-500/50 to-amber-400/50 shadow-[0_10px_40px_rgba(0,0,0,0.6)]">
+      <nav class="nav-scroll flex items-center gap-2 overflow-x-auto rounded-2xl bg-[#0a0e1d]/[0.88] backdrop-blur-xl px-2 py-2" aria-label="Sekcje raportu (pasek)"></nav>
+    </div>
+  </div>
 
   <!-- GŁÓWNY KONTENER -->
   <div class="max-w-[1540px] mx-auto px-4 sm:px-8 py-10 space-y-14">
@@ -331,27 +421,16 @@
               </div>
             </div>
 
-            <!-- Filtry tygodni -->
-            <div class="pt-2 flex flex-wrap items-center gap-2" id="week-filters">
-              <button data-filter="all" class="filter-btn active px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-purple-600 text-white border border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.5)] transition cursor-pointer">
-                Wszystkie (26)
-              </button>
-              <button data-filter="1" class="filter-btn px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-slate-900/80 text-slate-300 border border-slate-700 hover:border-sky-400 transition cursor-pointer">
-                Tydzień 1
-              </button>
-              <button data-filter="2" class="filter-btn px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-slate-900/80 text-slate-300 border border-slate-700 hover:border-cyan-400 transition cursor-pointer">
-                Tydzień 2
-              </button>
-              <button data-filter="3" class="filter-btn px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-slate-900/80 text-slate-300 border border-slate-700 hover:border-slate-300 transition cursor-pointer">
-                Tydzień 3
-              </button>
-              <button data-filter="4" class="filter-btn px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-slate-900/80 text-slate-300 border border-slate-700 hover:border-amber-400 transition cursor-pointer">
-                Tydzień 4
-              </button>
-              <button data-filter="5" class="filter-btn px-4 py-2 rounded-lg text-xs font-hud font-bold uppercase tracking-wider bg-slate-900/80 text-slate-300 border border-slate-700 hover:border-purple-400 transition cursor-pointer">
-                Tydzień 5
-              </button>
-            </div>
+            <!-- Nawigacja po sekcjach (powielana w przypiętym pasku) -->
+            <nav class="pt-2 flex flex-wrap items-center gap-2" id="section-nav" aria-label="Sekcje raportu">
+              <a href="#certificate" data-target="certificate" style="--pill: 251, 191, 36" class="nav-pill">Certyfikat</a>
+              <a href="#week-1" data-target="week-1" style="--pill: 56, 189, 248" class="nav-pill">Tydzień 1</a>
+              <a href="#week-2" data-target="week-2" style="--pill: 6, 182, 212" class="nav-pill">Tydzień 2</a>
+              <a href="#week-3" data-target="week-3" style="--pill: 148, 163, 184" class="nav-pill">Tydzień 3</a>
+              <a href="#week-4" data-target="week-4" style="--pill: 245, 158, 11" class="nav-pill">Tydzień 4</a>
+              <a href="#week-5" data-target="week-5" style="--pill: 168, 85, 247" class="nav-pill">Tydzień 5</a>
+              <a href="#dostrack" data-target="dostrack" style="--pill: 192, 132, 252" class="nav-pill">Projekt</a>
+            </nav>
           </div>
 
         </div>
@@ -359,7 +438,7 @@
     </header>
 
     <!-- SEKCJA CERTYFIKATU UKOŃCZENIA -->
-    <section aria-labelledby="certificate-heading" class="relative p-[1px] bg-gradient-to-r from-amber-400/60 via-purple-500/60 to-cyan-400/60 hud-frame shadow-[0_0_50px_rgba(245,158,11,0.15)]">
+    <section id="certificate" style="--flash: 251, 191, 36" aria-labelledby="certificate-heading" class="nav-target relative p-[1px] bg-gradient-to-r from-amber-400/60 via-purple-500/60 to-cyan-400/60 hud-frame shadow-[0_0_50px_rgba(245,158,11,0.15)]">
       <div class="bg-[#0a0e1d]/92 backdrop-blur-xl p-6 sm:p-8 hud-frame space-y-6">
       <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
 
@@ -440,7 +519,7 @@
     <main id="weeks-container" class="space-y-12"></main>
 
     <!-- PROJEKT KOŃCOWY: DOSTRACK -->
-    <section aria-labelledby="dostrack-heading" class="relative p-[1px] bg-gradient-to-r from-cyan-400/60 via-purple-500/60 to-amber-400/60 hud-frame shadow-[0_0_50px_rgba(168,85,247,0.18)]">
+    <section id="dostrack" style="--flash: 192, 132, 252" aria-labelledby="dostrack-heading" class="nav-target relative p-[1px] bg-gradient-to-r from-cyan-400/60 via-purple-500/60 to-amber-400/60 hud-frame shadow-[0_0_50px_rgba(168,85,247,0.18)]">
       <div class="bg-[#090d1c]/92 backdrop-blur-md p-5 sm:p-8 hud-frame">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 mb-6 border-b border-white/10">
           <div class="flex flex-wrap items-center gap-3">
@@ -668,16 +747,17 @@
     // Zoptymalizowana miniatura WebP: images/1.1.jpg -> images/thumbs/1.1.webp
     const thumbOf = (file) => file.replace('images/', 'images/thumbs/').replace(/\.jpg$/, '.webp');
 
-    function renderWeeks(filter = 'all') {
+    function renderWeeks() {
       container.innerHTML = '';
-      const filtered = filter === 'all' ? weeksData : weeksData.filter(w => String(w.week) === String(filter));
 
-      filtered.forEach(w => {
-        const section = document.createElement('section');
-        section.className = `relative p-[1px] bg-gradient-to-r ${w.borderClass} hud-frame shadow-[0_0_40px_rgba(0,0,0,0.6)]`;
-
+      weeksData.forEach(w => {
         // Kolor poświaty tygodnia, np. "56,189,248" z definicji badgeHover
         const glow = (w.badgeHover.match(/rgba\((\d+,\s*\d+,\s*\d+)/) || [])[1] || '168,85,247';
+
+        const section = document.createElement('section');
+        section.id = `week-${w.week}`;
+        section.style.setProperty('--flash', glow);
+        section.className = `nav-target relative p-[1px] bg-gradient-to-r ${w.borderClass} hud-frame shadow-[0_0_40px_rgba(0,0,0,0.6)]`;
 
         const cardsHtml = w.cards.map(card => `
           <div onclick="openLightbox('${card.file}', '${thumbOf(card.file)}', false, this)" style="--glow: ${glow}"
@@ -719,18 +799,55 @@
       });
     }
 
-    // Obsługa filtrowania
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => {
-          b.classList.remove('bg-purple-600', 'text-white', 'border-purple-400', 'shadow-[0_0_15px_rgba(168,85,247,0.5)]');
-          b.classList.add('bg-slate-900/80', 'text-slate-300', 'border-slate-700');
-        });
-        btn.classList.remove('bg-slate-900/80', 'text-slate-300', 'border-slate-700');
-        btn.classList.add('bg-purple-600', 'text-white', 'border-purple-400', 'shadow-[0_0_15px_rgba(168,85,247,0.5)]');
-        renderWeeks(btn.dataset.filter);
+    // ==========================================
+    // NAWIGACJA PO SEKCJACH: przewijanie, przypięty pasek, podświetlanie bieżącej sekcji
+    // ==========================================
+    function initSectionNav() {
+      const heroNav = document.getElementById('section-nav');
+      const stickyNav = document.getElementById('sticky-nav');
+      const stickyInner = stickyNav.querySelector('nav');
+      stickyInner.innerHTML = heroNav.innerHTML;
+      const pills = document.querySelectorAll('.nav-pill');
+      const targets = [...document.querySelectorAll('.nav-target')];
+
+      function setActive(id) {
+        pills.forEach(p => p.classList.toggle('is-active', p.dataset.target === id));
+        // W pasku na wąskim ekranie aktywny przycisk ma być widoczny
+        const activeSticky = stickyInner.querySelector(`[data-target="${id}"]`);
+        if (activeSticky && stickyNav.classList.contains('is-visible')) {
+          activeSticky.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+        }
+      }
+
+      // Kliknięcie: płynne przewinięcie (CSS) + rozbłysk sekcji docelowej
+      pills.forEach(pill => pill.addEventListener('click', () => {
+        const target = document.getElementById(pill.dataset.target);
+        if (!target) return;
+        setActive(pill.dataset.target);
+        target.classList.remove('is-flashing');
+        void target.offsetWidth;
+        setTimeout(() => target.classList.add('is-flashing'), 450);
+      }));
+
+      targets.forEach(t => t.addEventListener('animationend', (e) => {
+        if (e.target === t && e.animationName === 'sectionPulse') t.classList.remove('is-flashing');
+      }));
+
+      // Bieżąca sekcja = ta, która przecina pas na wysokości ~40% ekranu
+      const spy = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
+      }, { rootMargin: '-40% 0px -55% 0px' });
+      targets.forEach(t => spy.observe(t));
+
+      // Pasek pojawia się, gdy przyciski w nagłówku zniknęły u góry ekranu
+      const toggleSticky = new IntersectionObserver(([e]) => {
+        const show = !e.isIntersecting && e.boundingClientRect.top < 0;
+        stickyNav.classList.toggle('is-visible', show);
+        stickyNav.setAttribute('aria-hidden', String(!show));
+        stickyInner.querySelectorAll('a').forEach(a => a.tabIndex = show ? 0 : -1);
       });
-    });
+      toggleSticky.observe(heroNav);
+    }
 
     // Pochylenie 3D odznak za kursorem (tylko mysz, z poszanowaniem ograniczenia animacji)
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1008,7 +1125,8 @@
       }
     });
 
-    renderWeeks('all');
+    renderWeeks();
+    initSectionNav();
   </script>
 </body>
 </html>
