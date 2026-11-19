@@ -168,7 +168,7 @@
           <!-- Lewa kolumna: Oryginalne zdjęcie profilowe -->
           <div class="lg:col-span-5 xl:col-span-4 flex justify-center">
             <div class="relative group w-full max-w-[400px] rounded-2xl overflow-hidden border-2 border-cyan-400/50 shadow-[0_0_40px_rgba(6,182,212,0.25)]">
-              <img src="images/profil.jpg" alt="Profil 10xDEVS" class="w-full h-auto block object-cover transition duration-500 group-hover:scale-[1.02]" />
+              <img src="images/profil.webp" width="800" height="800" fetchpriority="high" decoding="async" alt="Profil 10xDEVS" class="w-full h-auto block object-cover transition duration-500 group-hover:scale-[1.02]" />
               <div class="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-cyan-400/20 to-transparent pointer-events-none animate-scan"></div>
             </div>
           </div>
@@ -366,7 +366,8 @@
 
         <!-- Karta certyfikatu 3D -->
         <div id="cert-3d-card" class="cert-3d-card relative rounded-xl overflow-hidden border-2 border-amber-300/70 shadow-[0_25px_70px_rgba(0,0,0,0.85),0_0_40px_rgba(245,158,11,0.3)] cursor-grab active:cursor-grabbing">
-          <img src="images/10xDevs_certificate_aturewicz.jpg" 
+          <img id="cert-img" data-src="images/certificate-preview.webp"
+               width="2000" height="1414"
                alt="Certyfikat ukończenia 10xDEVS 4.0" 
                draggable="false"
                class="max-w-full max-h-[68vh] w-auto h-auto block pointer-events-none" />
@@ -478,6 +479,9 @@
 
     const container = document.getElementById('weeks-container');
 
+    // Zoptymalizowana miniatura WebP: images/1.1.jpg -> images/thumbs/1.1.webp
+    const thumbOf = (file) => file.replace('images/', 'images/thumbs/').replace(/\.jpg$/, '.webp');
+
     function renderWeeks(filter = 'all') {
       container.innerHTML = '';
       const filtered = filter === 'all' ? weeksData : weeksData.filter(w => String(w.week) === String(filter));
@@ -487,9 +491,9 @@
         section.className = `relative p-[1px] bg-gradient-to-r ${w.borderClass} hud-frame shadow-[0_0_40px_rgba(0,0,0,0.6)]`;
 
         const cardsHtml = w.cards.map(card => `
-          <div onclick="openLightbox('${card.file}')" 
+          <div onclick="openLightbox('${card.file}', '${thumbOf(card.file)}')"
                class="badge-card group relative rounded-xl overflow-hidden bg-[#090d1a] border border-white/10 ${w.badgeHover} cursor-pointer">
-            <img src="${card.file}" alt="${card.label}" loading="lazy" class="w-full h-auto block" />
+            <img src="${thumbOf(card.file)}" alt="${card.label}" width="480" height="767" loading="lazy" decoding="async" class="w-full h-auto block" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
               <span class="px-2.5 py-1 rounded bg-black/80 text-[11px] font-hud tracking-wider text-white border border-white/20">
                 POWIĘKSZ 🔍
@@ -541,8 +545,12 @@
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
 
-    function openLightbox(src) {
-      lightboxImg.src = src;
+    function openLightbox(src, thumb) {
+      // Najpierw miniatura (jest już w cache), potem podmiana na pełną rozdzielczość
+      lightboxImg.src = thumb || src;
+      const full = new Image();
+      full.onload = () => { if (lightboxImg.src.endsWith(thumb)) lightboxImg.src = src; };
+      full.src = src;
       lightbox.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
     }
@@ -628,6 +636,9 @@
 
     function openCertModal() {
       buildAmbientParticles();
+      // Certyfikat ładowany dopiero przy pierwszym otwarciu modalu
+      const certImg = document.getElementById('cert-img');
+      if (!certImg.src) certImg.src = certImg.dataset.src;
       certModal.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
 
