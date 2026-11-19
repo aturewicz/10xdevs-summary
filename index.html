@@ -234,6 +234,31 @@
       animation: floatSparkle var(--dur, 3s) ease-in-out infinite;
       animation-delay: var(--delay, 0s);
     }
+
+    /* Migoczące gwiazdki wokół powiększonej odznaki */
+    .lb-star {
+      position: absolute;
+      width: var(--size);
+      height: var(--size);
+      margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+      color: var(--color);
+      filter: drop-shadow(0 0 6px var(--color)) drop-shadow(0 0 14px var(--color));
+      opacity: 0;
+      animation: starTwinkle var(--dur, 2.4s) ease-in-out var(--delay, 0s) infinite;
+    }
+
+    .lb-star svg { width: 100%; height: 100%; display: block; }
+
+    @keyframes starTwinkle {
+      0%, 100% { transform: scale(0.15) rotate(0deg); opacity: 0; }
+      30%      { transform: scale(1.1) rotate(40deg); opacity: 1; }
+      70%      { transform: scale(0.85) rotate(80deg); opacity: 0.85; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .lb-star { animation: none; opacity: 0.8; transform: scale(0.7); }
+      .sparkle-dot { animation: none; }
+    }
   </style>
 </head>
 <body class="space-bg min-h-screen antialiased selection:bg-purple-500 selection:text-white">
@@ -474,7 +499,11 @@
 
   <!-- MODAL / LIGHTBOX DO POWIĘKSZANIA ORYGINALNYCH ODZNAK -->
   <div id="lightbox" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4" onclick="closeLightbox()">
-    <div id="lightbox-frame" class="relative max-w-lg w-full animate-[fadeIn_0.2s_ease-out]" onclick="event.stopPropagation()">
+    <!-- Unoszące się iskierki w tle (jak przy certyfikacie) -->
+    <div id="lightbox-particles" class="pointer-events-none fixed inset-0 overflow-hidden"></div>
+    <div id="lightbox-frame" class="relative z-10 max-w-lg w-full animate-[fadeIn_0.2s_ease-out]" onclick="event.stopPropagation()">
+      <!-- Gwiazdki migoczące wokół krawędzi odznaki -->
+      <div id="lightbox-stars" class="pointer-events-none absolute -inset-12 sm:-inset-20"></div>
       <button onclick="closeLightbox()" class="absolute -top-12 right-0 px-4 py-1.5 bg-slate-800/90 hover:bg-purple-600 text-white font-hud text-xs tracking-wider rounded-lg border border-slate-600 transition cursor-pointer">
         ZAMKNIJ [ESC]
       </button>
@@ -740,6 +769,34 @@
     const lightboxFrame = document.getElementById('lightbox-frame');
 
     const lightboxCard = document.getElementById('lightbox-card');
+    const lightboxParticles = document.getElementById('lightbox-particles');
+    const lightboxStars = document.getElementById('lightbox-stars');
+    const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 C13 8 16 11 24 12 C16 13 13 16 12 24 C11 16 8 13 0 12 C8 11 11 8 12 0 Z"/></svg>';
+
+    // Gwiazdki rozsiane wzdłuż krawędzi karty: część za nią, część przed nią
+    function buildLightboxStars(colors, count = 34) {
+      lightboxStars.replaceChildren();
+      for (let i = 0; i < count; i++) {
+        const side = i % 4;                       // 0 góra, 1 prawo, 2 dół, 3 lewo
+        const along = Math.random() * 100;        // pozycja wzdłuż boku
+        const edge = Math.random() * 12;          // odległość od krawędzi kontenera (poza kartą)
+        const pos = [
+          [along, edge], [100 - edge, along], [along, 100 - edge], [edge, along]
+        ][side];
+        const star = document.createElement('span');
+        star.className = 'lb-star';
+        star.innerHTML = STAR_SVG;
+        const color = colors[i % colors.length];
+        star.style.left = `${pos[0]}%`;
+        star.style.top = `${pos[1]}%`;
+        star.style.zIndex = Math.random() < 0.3 ? 30 : 0;
+        star.style.setProperty('--size', `${Math.round(Math.random() * 22 + 14)}px`);
+        star.style.setProperty('--color', color);
+        star.style.setProperty('--dur', `${(Math.random() * 1.8 + 1.8).toFixed(2)}s`);
+        star.style.setProperty('--delay', `${(Math.random() * 2.5).toFixed(2)}s`);
+        lightboxStars.appendChild(star);
+      }
+    }
 
     // Po smudze światła z wejścia oddajemy kartę zwykłym efektom najechania
     lightboxCard.addEventListener('animationend', (e) => {
@@ -753,6 +810,10 @@
       // Powiększona karta przejmuje kolor poświaty tygodnia, z którego ją otwarto
       const glow = origin ? getComputedStyle(origin).getPropertyValue('--glow').trim() : '';
       lightboxCard.style.setProperty('--glow', glow || '168, 85, 247');
+      // Gwiazdki i iskierki w kolorze tygodnia, przemieszane ze złotem i bielą
+      const weekColor = `rgb(${glow || '168, 85, 247'})`;
+      buildLightboxStars([weekColor, '#ffffff', '#fbbf24', weekColor]);
+      fillParticles(lightboxParticles, [weekColor, '#ffffff', '#f59e0b', '#a855f7'], 40);
       lightboxCard.style.setProperty('--tilt-max', wide ? 5 : 9);
       // Wejście z obrotu 3D, za każdym razem od nowa
       lightboxCard.classList.remove('is-entering');
@@ -786,8 +847,13 @@
     // Generowanie unoszących się iskierek w tle modalu
     function buildAmbientParticles() {
       if (ambientContainer.children.length > 0) return;
-      const colors = ['#f59e0b', '#06b6d4', '#a855f7', '#ffffff'];
-      for (let i = 0; i < 36; i++) {
+      fillParticles(ambientContainer, ['#f59e0b', '#06b6d4', '#a855f7', '#ffffff'], 36);
+    }
+
+    // Wspólny generator iskierek: certyfikat i lightbox odznak
+    function fillParticles(container, colors, count) {
+      container.replaceChildren();
+      for (let i = 0; i < count; i++) {
         const dot = document.createElement('span');
         dot.className = 'sparkle-dot absolute rounded-full';
         const size = Math.random() * 4 + 2;
@@ -799,7 +865,7 @@
         dot.style.boxShadow = `0 0 ${size * 3}px ${colors[i % colors.length]}`;
         dot.style.setProperty('--dur', `${(Math.random() * 2.5 + 2).toFixed(2)}s`);
         dot.style.setProperty('--delay', `${(Math.random() * 2).toFixed(2)}s`);
-        ambientContainer.appendChild(dot);
+        container.appendChild(dot);
       }
     }
 
