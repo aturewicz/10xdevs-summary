@@ -21,7 +21,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta property="og:title" content="Podsumowanie 5-tygodniowego kursu 10xDEVS 4.0 — 26/26 osiągnięć" />
   <meta property="og:description" content="Interaktywny raport z ukończenia szkolenia 10xDevs (14.09.2026 – 18.10.2026): PRD, Multi-Agent Workflows, Testy E2E, Refaktoryzacja i Agent SDK." />
   <meta property="og:image" content="images/profil.jpg" />
@@ -259,6 +259,50 @@
     @media (prefers-reduced-motion: reduce) {
       .cert-cta, .cert-cta-inner::after { animation: none; }
       .cert-cta:hover { transform: none; }
+    }
+
+    /* Odręczna notatka ze strzałką wskazującą przycisk podglądu */
+    .cta-note {
+      position: absolute; left: -14px; bottom: calc(100% - 10px);
+      display: flex; align-items: flex-start; pointer-events: none; z-index: 5;
+      color: #fff;
+      filter: drop-shadow(0 2px 3px rgba(2, 6, 23, 0.75)) drop-shadow(0 0 10px rgba(2, 6, 23, 0.35));
+    }
+    .cta-note-text {
+      font-family: 'Caveat', cursive; font-weight: 700; font-size: 2rem; line-height: 1;
+      white-space: nowrap; transform: rotate(-7deg); margin-top: -2px;
+      opacity: 0; transition: opacity .5s ease;
+    }
+    .cta-note-arrow { width: 86px; height: 64px; margin-left: 2px; margin-top: 8px; overflow: visible; }
+    .cta-note-arrow path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+    .cta-attention .cta-note-text { opacity: 1; }
+    .cta-attention .cta-note-arrow .shaft { animation: drawStroke .9s ease-out .35s forwards; }
+    .cta-attention .cta-note-arrow .head  { animation: drawStroke .3s ease-out 1.2s forwards; }
+    .cta-attention .cta-note { animation: noteNudge 2.4s ease-in-out 2s infinite; }
+    .cta-done .cta-note { opacity: 0; transition: opacity .4s ease; }
+    /* Tryb jasny: notatka w ciemnym fiolecie, przycisk w jasnym szkle */
+    html[data-theme="light"] .cta-note {
+      color: #6d28d9;
+      filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
+    }
+    html[data-theme="light"] .cert-cta-inner {
+      background: linear-gradient(120deg, #7c3aed, #4f46e5 50%, #0891b2);
+      color: #fff;
+    }
+    html[data-theme="light"] .cert-cta:hover .cert-cta-inner { background: linear-gradient(120deg, #8b5cf6, #6366f1 50%, #06b6d4); }
+    html[data-theme="light"] .cert-cta-inner .text-cyan-400 { color: #fff; }
+    html[data-theme="light"] .cert-cta-inner .bg-cyan-400\/15 { background-color: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.5); }
+    @keyframes ctaGlowLight {
+      0%, 100% { box-shadow: 0 6px 18px -4px rgba(124, 58, 237, 0.45), 0 0 0 0 rgba(8, 145, 178, 0); }
+      50%      { box-shadow: 0 10px 28px -4px rgba(8, 145, 178, 0.55), 0 0 0 6px rgba(124, 58, 237, 0.12); }
+    }
+    html[data-theme="light"] .cert-cta { animation: ctaBorder 6s linear infinite, ctaGlowLight 2.6s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { html[data-theme="light"] .cert-cta { animation: none; } }
+    @keyframes drawStroke { to { stroke-dashoffset: 0; } }
+    @keyframes noteNudge { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(3px, 3px); } }
+    @media (prefers-reduced-motion: reduce) {
+      .cta-note-arrow path { stroke-dashoffset: 0; }
+      .cta-attention .cta-note-arrow path, .cta-attention .cta-note { animation: none; }
     }
 
     /* Scena 3D dla certyfikatu */
@@ -1000,6 +1044,14 @@
 
         <!-- Przyciski akcji -->
         <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto shrink-0">
+          <div id="cert-cta-wrap" class="relative flex-1 sm:flex-initial flex mt-16">
+          <div class="cta-note" aria-hidden="true">
+            <span class="cta-note-text">zobacz w 3D!</span>
+            <svg class="cta-note-arrow" viewBox="0 0 72 54" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <path class="shaft" pathLength="1" d="M4 12 C 26 2, 50 6, 44 22 C 38 36, 52 44, 64 48" />
+              <path class="head" pathLength="1" d="M53 47 L65 48.5 L59 38" />
+            </svg>
+          </div>
           <button onclick="openCertModal()"
                   class="cert-cta group relative flex-1 sm:flex-initial inline-flex p-[2px] rounded-2xl transition-transform duration-300 cursor-pointer">
             <span class="cert-cta-inner w-full inline-flex items-center justify-center gap-3 px-7 py-4 rounded-[14px] bg-slate-950 group-hover:bg-slate-800 text-slate-50 font-hud text-sm font-black uppercase tracking-wider transition">
@@ -1015,6 +1067,7 @@
               </svg>
             </span>
           </button>
+          </div>
         </div>
 
       </div>
@@ -1637,7 +1690,12 @@
       }
     }
 
+    // Zachęta: odręczna strzałka „rysuje się” chwilę po wejściu na stronę
+    const certCtaWrap = document.getElementById('cert-cta-wrap');
+    setTimeout(() => certCtaWrap.classList.add('cta-attention'), 900);
+
     function openCertModal() {
+      certCtaWrap.classList.add('cta-done');
       buildAmbientParticles();
       // Certyfikat ładowany dopiero przy pierwszym otwarciu modalu
       const certImg = document.getElementById('cert-img');
