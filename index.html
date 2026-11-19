@@ -308,6 +308,53 @@
     <!-- KONTENER NA SEKCJE TYGODNI (GENEROWANY DYNAMICZNIE Z TWOICH ORYGINALNYCH ZDJĘĆ) -->
     <main id="weeks-container" class="space-y-12"></main>
 
+    <!-- PROJEKT KOŃCOWY: DOSTRACK -->
+    <section aria-labelledby="dostrack-heading" class="relative p-[1px] bg-gradient-to-r from-cyan-400/60 via-purple-500/60 to-amber-400/60 hud-frame shadow-[0_0_50px_rgba(168,85,247,0.18)]">
+      <div class="bg-[#090d1c]/92 backdrop-blur-md p-5 sm:p-8 hud-frame">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 mb-6 border-b border-white/10">
+          <div class="flex flex-wrap items-center gap-3">
+            <span id="dostrack-heading" class="font-hud text-xl sm:text-2xl font-black tracking-wider bg-gradient-to-r from-cyan-300 via-purple-400 to-amber-300 bg-clip-text text-transparent">
+              PROJEKT KOŃCOWY
+            </span>
+            <span class="text-slate-600 hidden sm:inline">//</span>
+            <span class="text-slate-200 font-semibold text-base sm:text-lg">
+              Dostrack: aplikacja do pilnowania dawek leków
+            </span>
+          </div>
+          <span class="self-start sm:self-auto px-3 py-1 rounded-md border text-xs font-hud font-bold tracking-wider bg-amber-500/15 border-amber-400/40 text-amber-200">
+            WDROŻONY NA PRODUKCJĘ
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-[7fr_10fr] gap-4 sm:gap-5 items-start">
+          <div onclick="openLightbox('images/dostrack-showcase/dostrack-card.jpg', 'images/dostrack-showcase/dostrack-card.webp')"
+               class="badge-card group relative rounded-xl overflow-hidden bg-[#090d1a] border border-white/10 hover:shadow-[0_10px_35px_rgba(168,85,247,0.35)] hover:border-purple-400 cursor-pointer">
+            <img src="images/dostrack-showcase/dostrack-card.webp" alt="Dostrack: karta projektu końcowego" width="920" height="1470" loading="lazy" decoding="async" class="w-full h-auto block" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
+              <span class="px-2.5 py-1 rounded bg-black/80 text-[11px] font-hud tracking-wider text-white border border-white/20">POWIĘKSZ 🔍</span>
+            </div>
+          </div>
+
+          <div class="grid gap-4 sm:gap-5">
+            <div onclick="openLightbox('images/dostrack-showcase/dostrack-hero.jpg', 'images/dostrack-showcase/dostrack-hero.webp', true)"
+                 class="badge-card group relative rounded-xl overflow-hidden bg-[#090d1a] border border-white/10 hover:shadow-[0_10px_35px_rgba(34,211,238,0.35)] hover:border-cyan-400 cursor-pointer">
+              <img src="images/dostrack-showcase/dostrack-hero.webp" alt="Dostrack: najważniejsze funkcje i zrzuty aplikacji" width="1920" height="1080" loading="lazy" decoding="async" class="w-full h-auto block" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
+                <span class="px-2.5 py-1 rounded bg-black/80 text-[11px] font-hud tracking-wider text-white border border-white/20">POWIĘKSZ 🔍</span>
+              </div>
+            </div>
+            <div onclick="openLightbox('images/dostrack-showcase/dostrack-ops.jpg', 'images/dostrack-showcase/dostrack-ops.webp', true)"
+                 class="badge-card group relative rounded-xl overflow-hidden bg-[#090d1a] border border-white/10 hover:shadow-[0_10px_35px_rgba(245,158,11,0.35)] hover:border-amber-400 cursor-pointer">
+              <img src="images/dostrack-showcase/dostrack-ops.webp" alt="Dostrack: testy, pipeline i monitoring produkcji" width="1920" height="1080" loading="lazy" decoding="async" class="w-full h-auto block" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
+                <span class="px-2.5 py-1 rounded bg-black/80 text-[11px] font-hud tracking-wider text-white border border-white/20">POWIĘKSZ 🔍</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- STOPKA -->
     <footer class="text-center pb-8 pt-4">
       <div class="inline-block px-8 py-4 bg-[#0a0e1d]/90 border border-purple-500/40 hud-frame shadow-[0_0_30px_rgba(168,85,247,0.15)]">
@@ -321,7 +368,7 @@
 
   <!-- MODAL / LIGHTBOX DO POWIĘKSZANIA ORYGINALNYCH ODZNAK -->
   <div id="lightbox" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4" onclick="closeLightbox()">
-    <div class="relative max-w-lg w-full animate-[fadeIn_0.2s_ease-out]" onclick="event.stopPropagation()">
+    <div id="lightbox-frame" class="relative max-w-lg w-full animate-[fadeIn_0.2s_ease-out]" onclick="event.stopPropagation()">
       <button onclick="closeLightbox()" class="absolute -top-12 right-0 px-4 py-1.5 bg-slate-800/90 hover:bg-purple-600 text-white font-hud text-xs tracking-wider rounded-lg border border-slate-600 transition cursor-pointer">
         ZAMKNIJ [ESC]
       </button>
@@ -545,7 +592,12 @@
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
 
-    function openLightbox(src, thumb) {
+    const lightboxFrame = document.getElementById('lightbox-frame');
+
+    function openLightbox(src, thumb, wide = false) {
+      // Szerokie grafiki (16:9) dostają szersze okno niż pionowe odznaki
+      lightboxFrame.classList.toggle('max-w-lg', !wide);
+      lightboxFrame.classList.toggle('max-w-6xl', wide);
       // Najpierw miniatura (jest już w cache), potem podmiana na pełną rozdzielczość
       lightboxImg.src = thumb || src;
       const full = new Image();
