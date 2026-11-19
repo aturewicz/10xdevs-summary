@@ -176,7 +176,7 @@
       </div>
     </header>
 
-    <!-- SEKCJA CERTYFIKATU UKOŃCZENIA (PDF) -->
+    <!-- SEKCJA CERTYFIKATU UKOŃCZENIA (PNG) -->
     <section aria-labelledby="certificate-heading" class="relative p-[1px] bg-gradient-to-r from-amber-400/60 via-purple-500/60 to-cyan-400/60 hud-frame shadow-[0_0_50px_rgba(245,158,11,0.15)]">
       <div class="bg-[#0a0e1d]/92 backdrop-blur-xl p-6 sm:p-8 hud-frame flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         
@@ -191,7 +191,7 @@
           <div class="space-y-1.5">
             <div class="flex flex-wrap items-center gap-2">
               <span class="px-2.5 py-0.5 text-[11px] font-hud font-bold tracking-widest uppercase bg-amber-500/15 text-amber-300 border border-amber-400/40 rounded">
-                DOKUMENT WERYFIKACYJNY // PDF
+                DOKUMENT WERYFIKACYJNY // PNG
               </span>
               <span class="text-xs font-hud text-slate-400 tracking-wider">
                 EDYCJA 4.0 (14.09 – 18.10.2026)
@@ -206,7 +206,7 @@
           </div>
         </div>
 
-        <!-- Przyciski akcji PDF -->
+        <!-- Przyciski akcji PNG -->
         <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto shrink-0">
           <button onclick="openCertModal()" 
                   class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-hud text-xs font-black uppercase tracking-wider shadow-[0_0_25px_rgba(245,158,11,0.35)] transition cursor-pointer">
@@ -217,15 +217,15 @@
             Podgląd certyfikatu
           </button>
 
-          <a href="certyfikat.pdf" target="_blank" rel="noopener noreferrer"
+          <a href="images/10xDevs_certificate_aturewicz.png" target="_blank" rel="noopener noreferrer"
              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-cyan-300 border border-cyan-400/40 hover:border-cyan-300 font-hud text-xs font-bold uppercase tracking-wider transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
-            Otwórz PDF
+            Otwórz PNG
           </a>
 
-          <a href="certyfikat.pdf" download="Certyfikat-10xDEVS-4.0.pdf"
+          <a href="images/10xDevs_certificate_aturewicz.png" download="10xDevs_certificate_aturewicz.png"
              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-purple-400 font-hud text-xs font-bold uppercase tracking-wider transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -261,26 +261,26 @@
     </div>
   </div>
 
-  <!-- MODAL PODGLĄDU CERTYFIKATU PDF -->
+  <!-- MODAL PODGLĄDU CERTYFIKATU PNG -->
   <div id="cert-modal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6" onclick="closeCertModal()">
-    <div class="relative w-full max-w-5xl h-[85vh] bg-[#0a0e1d] rounded-2xl border-2 border-amber-400/60 shadow-[0_0_60px_rgba(245,158,11,0.3)] flex flex-col overflow-hidden" onclick="event.stopPropagation()">
-      <div class="flex items-center justify-between px-5 py-3.5 bg-[#11172e] border-b border-white/10">
+    <div class="relative w-full max-w-5xl max-h-[90vh] bg-[#0a0e1d] rounded-2xl border-2 border-amber-400/60 shadow-[0_0_60px_rgba(245,158,11,0.3)] flex flex-col overflow-hidden" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between px-5 py-3.5 bg-[#11172e] border-b border-white/10 shrink-0">
         <div class="flex items-center gap-2.5">
           <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
           <span class="font-hud text-xs sm:text-sm font-bold tracking-wider text-white">CERTYFIKAT UKOŃCZENIA // 10xDEVS 4.0</span>
         </div>
         <div class="flex items-center gap-2">
-          <a href="certyfikat.pdf" download="Certyfikat-10xDEVS-4.0.pdf"
+          <a href="images/10xDevs_certificate_aturewicz.png" download="10xDevs_certificate_aturewicz.png"
              class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 rounded-lg font-hud text-xs font-bold tracking-wider transition">
-            POBIERZ PDF
+            POBIERZ PNG
           </a>
           <button onclick="closeCertModal()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-purple-600 text-white font-hud text-xs font-bold tracking-wider rounded-lg border border-slate-600 transition cursor-pointer">
             ZAMKNIJ [ESC]
           </button>
         </div>
       </div>
-      <div class="flex-1 bg-slate-950 relative">
-        <iframe src="certyfikat.pdf#toolbar=0&navpanes=0" title="Podgląd certyfikatu 10xDEVS 4.0" class="w-full h-full border-0"></iframe>
+      <div class="flex-1 bg-slate-950 overflow-auto p-4 sm:p-6 flex items-center justify-center">
+        <img src="images/10xDevs_certificate_aturewicz.png" alt="Certyfikat ukończenia 10xDEVS 4.0" class="max-w-full max-h-[75vh] w-auto h-auto rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/10" />
       </div>
     </div>
   </div>
@@ -451,7 +451,7 @@
       document.body.style.overflow = '';
     }
 
-    // Modal dla certyfikatu PDF
+    // Modal dla certyfikatu PNG
     const certModal = document.getElementById('cert-modal');
 
     function openCertModal() {
