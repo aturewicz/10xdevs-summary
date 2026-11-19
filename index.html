@@ -4,6 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>10xDEVS 4.0 — Podsumowanie Misji</title>
+  <meta name="theme-color" content="#05070f" />
+  <script>
+    // Motyw: zapamiętany wybór, a bez niego ustawienie systemu. Ustawiany przed malowaniem, żeby nie mignęło.
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (e) {}
+      var theme = saved === 'light' || saved === 'dark' ? saved
+        : (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      var root = document.documentElement;
+      root.dataset.theme = theme;
+      root.classList.toggle('dark', theme === 'dark');
+    })();
+  </script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2306b6d4'/%3E%3Cstop offset='50%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%23f59e0b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpolygon points='32,3 58,18 58,46 32,61 6,46 6,18' fill='%230a0e1d' stroke='url(%23g)' stroke-width='4'/%3E%3Ctext x='32' y='38' font-family='sans-serif' font-weight='900' font-size='20' fill='%23ffffff' text-anchor='middle' letter-spacing='-1'%3E10x%3C/text%3E%3C/svg%3E" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -531,9 +544,158 @@
       .lb-star { animation: none; opacity: 0.8; transform: scale(0.7); }
       .sparkle-dot { animation: none; }
     }
+
+    /* ===== Przełącznik trybu dzień / noc ===== */
+    .theme-toggle {
+      position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 45;
+      display: grid; place-items: center;
+      width: 3.25rem; height: 3.25rem;
+      border-radius: 9999px;
+      color: #fbbf24;
+      background:
+        linear-gradient(rgba(10, 14, 29, 0.9), rgba(10, 14, 29, 0.9)) padding-box,
+        linear-gradient(135deg, #22d3ee, #a855f7, #f59e0b) border-box;
+      border: 1.5px solid transparent;
+      box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.7), 0 0 22px rgba(168, 85, 247, 0.35);
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+    }
+    .theme-toggle:hover { transform: translateY(-3px) rotate(-8deg); box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.7), 0 0 30px rgba(245, 158, 11, 0.5); }
+    .theme-toggle:focus-visible { outline: 2px solid #22d3ee; outline-offset: 3px; }
+    .theme-toggle svg {
+      grid-area: 1 / 1; width: 1.45rem; height: 1.45rem;
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+    }
+    /* Noc: widać słońce (kliknij, by zrobić dzień); dzień: widać księżyc */
+    .theme-toggle .tt-sun  { filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.8)); }
+    .theme-toggle .tt-moon { opacity: 0; transform: rotate(-90deg) scale(0.4); }
+
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .theme-toggle, .theme-toggle svg { transition: none; }
+      .theme-toggle:hover { transform: none; }
+    }
+
+    /* =====================================================================
+       TRYB DZIENNY — „Daylight HUD”: jasne szkło, te same neonowe akcenty,
+       ale przyciemnione do czytelnego kontrastu i z miękkimi cieniami.
+       Nakładki (lightbox, certyfikat 3D) celowo zostają ciemne.
+       ===================================================================== */
+    html[data-theme="light"] {
+      --bg-deep: #eef2fb;
+      color-scheme: light;
+    }
+    html[data-theme="light"] body { color: #0f172a; }
+
+    html[data-theme="light"] .space-bg {
+      background-image:
+        radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 85% 25%, rgba(6, 182, 212, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 50% 60%, rgba(245, 158, 11, 0.10) 0%, transparent 50%),
+        radial-gradient(circle at 20% 85%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
+        linear-gradient(rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+    }
+
+    /* Panele: ciemne szkło -> jasne szkło */
+    html[data-theme="light"] :is(.page, #sticky-nav) :is([class*="bg-[#0a0e1d]"], [class*="bg-[#090d1c]"]) {
+      background-color: rgba(255, 255, 255, 0.86);
+    }
+    html[data-theme="light"] .page [class*="bg-[#090d1a]"] { background-color: #fff; }
+
+    /* Obramowania-gradienty sekcji świecą delikatniej, cień zamiast czarnej poświaty */
+    html[data-theme="light"] .page :is(header, section, footer > div) {
+      box-shadow: 0 18px 50px -24px rgba(76, 29, 149, 0.28), 0 4px 14px -6px rgba(15, 23, 42, 0.08);
+    }
+    html[data-theme="light"] #sticky-nav > div { box-shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.25); }
+
+    /* Tekst */
+    html[data-theme="light"] .page .text-white:not([class*="bg-black/80"]) { color: #0f172a; }
+    html[data-theme="light"] .page .text-slate-100 { color: #1e293b; }
+    html[data-theme="light"] .page .text-slate-200 { color: #334155; }
+    html[data-theme="light"] .page .text-slate-300 { color: #475569; }
+    html[data-theme="light"] .page .text-slate-400 { color: #64748b; }
+    html[data-theme="light"] .page .text-slate-600 { color: #94a3b8; }
+    html[data-theme="light"] .page :is(.text-cyan-200, .text-cyan-300) { color: #0e7490; }
+    html[data-theme="light"] .page :is(.text-sky-200, .text-sky-300) { color: #0369a1; }
+    html[data-theme="light"] .page :is(.text-purple-200, .text-purple-300, .text-purple-400) { color: #7e22ce; }
+    html[data-theme="light"] .page :is(.text-amber-200, .text-amber-300, .text-amber-400) { color: #b45309; }
+
+    /* Obramówki i tła pomocnicze */
+    html[data-theme="light"] .page .border-white\/10 { border-color: rgba(15, 23, 42, 0.10); }
+    html[data-theme="light"] .page .border-white\/20 { border-color: rgba(15, 23, 42, 0.14); }
+    html[data-theme="light"] .page .border-white\/30 { border-color: rgba(15, 23, 42, 0.20); }
+    html[data-theme="light"] .page .bg-black\/40 { background-color: rgba(15, 23, 42, 0.06); }
+    html[data-theme="light"] .page .bg-slate-900 { background-color: #e2e8f0; }
+    html[data-theme="light"] .page .bg-slate-900\/90 { background-color: #fff; }
+    html[data-theme="light"] .page .bg-slate-900\/90:hover { background-color: #f1f5f9; }
+    html[data-theme="light"] .page .border-slate-700 { border-color: #cbd5e1; }
+
+    /* Nagłówki z gradientem: z pastelowych na nasycone */
+    html[data-theme="light"] .page h1 {
+      background-image: linear-gradient(90deg, #0f172a, #4c1d95 55%, #0e7490);
+      filter: none;
+    }
+    html[data-theme="light"] #dostrack-heading { background-image: linear-gradient(90deg, #0e7490, #7e22ce, #b45309); }
+
+    /* Kafelki statystyk */
+    html[data-theme="light"] .stat-tile {
+      background:
+        radial-gradient(120% 90% at 100% 0%, rgba(var(--c), 0.14), transparent 60%),
+        linear-gradient(180deg, #ffffff, #f8fafc);
+      box-shadow: 0 6px 20px -10px rgba(var(--c), 0.45), inset 0 1px 0 #fff;
+    }
+    html[data-theme="light"] .stat-tile:hover { box-shadow: 0 16px 34px -14px rgba(var(--c), 0.6); }
+    html[data-theme="light"] :is(.stat-label, .stat-sub) { color: #64748b; }
+    html[data-theme="light"] :is(.stat-value, .stat-icon) {
+      color: color-mix(in srgb, rgb(var(--c)) 62%, #0f172a);
+      text-shadow: none;
+    }
+    html[data-theme="light"] .stat-value-dim { color: color-mix(in srgb, rgb(var(--c)) 45%, #cbd5e1); }
+    html[data-theme="light"] .stat-ring-label { color: #0f172a; }
+    html[data-theme="light"] .stat-icon { box-shadow: none; }
+    html[data-theme="light"] .stat-seg { box-shadow: 0 2px 6px rgba(var(--seg), 0.45); }
+
+    /* Przyciski nawigacji */
+    html[data-theme="light"] .nav-pill { background: #fff; border-color: #cbd5e1; color: #475569; }
+    html[data-theme="light"] .nav-pill:hover,
+    html[data-theme="light"] .nav-pill:focus-visible { color: #0f172a; }
+    html[data-theme="light"] .nav-pill.is-active {
+      color: color-mix(in srgb, rgb(var(--pill)) 55%, #0f172a);
+      background: rgba(var(--pill), 0.16);
+      box-shadow: 0 4px 14px -4px rgba(var(--pill), 0.6);
+    }
+
+    /* Karty odznak i zdjęcie profilowe */
+    html[data-theme="light"] .badge-card:hover {
+      box-shadow:
+        var(--sx) calc(var(--sy) + 24px) 40px -14px rgba(15, 23, 42, 0.35),
+        0 0 24px rgba(var(--glow), 0.45);
+    }
+    html[data-theme="light"] .profile-aura { opacity: 0.45; }
+    html[data-theme="light"] .hud-corner { border-color: #0891b2; filter: drop-shadow(0 0 4px rgba(8, 145, 178, 0.5)); }
+
+    /* Przełącznik w dzień: jasna kapsuła z księżycem */
+    html[data-theme="light"] .theme-toggle {
+      color: #6d28d9;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)) padding-box,
+        linear-gradient(135deg, #22d3ee, #a855f7, #f59e0b) border-box;
+      box-shadow: 0 10px 26px -10px rgba(76, 29, 149, 0.45);
+    }
+    html[data-theme="light"] .theme-toggle .tt-sun  { opacity: 0; transform: rotate(90deg) scale(0.4); }
+    html[data-theme="light"] .theme-toggle .tt-moon { opacity: 1; transform: none; }
   </style>
 </head>
 <body class="space-bg min-h-screen antialiased selection:bg-purple-500 selection:text-white">
+
+  <!-- PRZEŁĄCZNIK TRYBU DZIEŃ / NOC -->
+  <button id="theme-toggle" type="button" class="theme-toggle" aria-label="Przełącz tryb dzienny / nocny">
+    <svg class="tt-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
+    <svg class="tt-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/><path d="M17 3.5v3M15.5 5h3" stroke-width="1.6"/></svg>
+  </button>
 
   <!-- PRZYPIĘTY PASEK NAWIGACJI (pojawia się po przewinięciu nagłówka; przyciski kopiowane z #section-nav) -->
   <div id="sticky-nav" class="fixed top-3 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-fit" aria-hidden="true">
@@ -543,7 +705,7 @@
   </div>
 
   <!-- GŁÓWNY KONTENER -->
-  <div class="max-w-[1540px] mx-auto px-4 sm:px-8 py-10 space-y-14">
+  <div class="page max-w-[1540px] mx-auto px-4 sm:px-8 py-10 space-y-14">
 
     <!-- HERO SECTION (PROFIL + STATYSTYKI MISJI) -->
     <header class="relative p-[1px] bg-gradient-to-r from-purple-500/60 via-cyan-400/60 to-purple-500/60 hud-frame shadow-[0_0_60px_rgba(168,85,247,0.2)]">
@@ -981,6 +1143,52 @@
     // Zoptymalizowana miniatura WebP: images/1.1.jpg -> images/thumbs/1.1.webp
     const thumbOf = (file) => file.replace('images/', 'images/thumbs/').replace(/\.jpg$/, '.webp');
 
+    // ==========================================
+    // TRYB DZIEŃ / NOC: przełącznik z kołowym odsłonięciem (View Transitions), zapamiętany w localStorage
+    // ==========================================
+    function initThemeToggle() {
+      const root = document.documentElement;
+      const btn = document.getElementById('theme-toggle');
+      const metaColor = document.querySelector('meta[name="theme-color"]');
+      const systemLight = window.matchMedia('(prefers-color-scheme: light)');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      const apply = (theme) => {
+        root.dataset.theme = theme;
+        root.classList.toggle('dark', theme === 'dark');
+        const light = theme === 'light';
+        btn.setAttribute('aria-pressed', String(light));
+        btn.title = light ? 'Tryb dzienny — przełącz na nocny' : 'Tryb nocny — przełącz na dzienny';
+        if (metaColor) metaColor.content = light ? '#eef2fb' : '#05070f';
+      };
+
+      apply(root.dataset.theme === 'light' ? 'light' : 'dark');
+
+      // Bez ręcznego wyboru strona podąża za ustawieniem systemu
+      systemLight.addEventListener('change', (e) => {
+        let saved = null;
+        try { saved = localStorage.getItem('theme'); } catch (err) {}
+        if (!saved) apply(e.matches ? 'light' : 'dark');
+      });
+
+      btn.addEventListener('click', () => {
+        const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+        try { localStorage.setItem('theme', next); } catch (err) {}
+
+        if (!document.startViewTransition || reduceMotion.matches) { apply(next); return; }
+
+        const r = btn.getBoundingClientRect();
+        const x = r.left + r.width / 2, y = r.top + r.height / 2;
+        const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+        document.startViewTransition(() => apply(next)).ready.then(() => {
+          root.animate(
+            { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+            { duration: 650, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' }
+          );
+        });
+      });
+    }
+
     function renderWeeks() {
       container.innerHTML = '';
 
@@ -1381,6 +1589,7 @@
 
     renderWeeks();
     initSectionNav();
+    initThemeToggle();
     animateMissionStats();
   </script>
 </body>
