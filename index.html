@@ -685,22 +685,24 @@
 
     /* Ciało niebieskie poruszające się po krzywej */
     .orbit-body {
+      /* Zerowy rozmiar: punkt ścieżki = środek ciała niezależnie od tego, jak przeglądarka liczy offset-anchor (Safari brał lewy górny róg) */
       position: absolute; top: 0; left: 0;
-      width: 24px; height: 24px;
+      width: 0; height: 0;
+      offset-anchor: 0 0;
       offset-path: path('M 22 20 C 46 46, 86 46, 110 20');
       offset-rotate: 0deg;
       offset-distance: 100%;
     }
     .orbit-rays {
-      position: absolute; inset: -7px; border-radius: 50%;
+      position: absolute; inset: -19px; border-radius: 50%;
       background: repeating-conic-gradient(#fbbf24 0deg 7deg, transparent 7deg 30deg);
       -webkit-mask: radial-gradient(closest-side, transparent 72%, #000 75%);
               mask: radial-gradient(closest-side, transparent 72%, #000 75%);
       opacity: 0; transform: scale(0.4) rotate(-90deg);
-      transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
+      transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1), scale 0.3s ease;
     }
     .orbit-orb {
-      position: absolute; inset: 0; border-radius: 50%;
+      position: absolute; inset: -12px; border-radius: 50%;
       background: radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.9), transparent 58%) #a78bfa;
       box-shadow: 0 0 14px rgba(167, 139, 250, 0.85), 0 0 30px rgba(139, 92, 246, 0.45);
       /* Wycięcie tworzy sierp: w nocy cień nasuwa się na tarczę, w dzień odjeżdża */
@@ -708,10 +710,13 @@
       -webkit-mask: radial-gradient(circle 10px at var(--cut-x) var(--cut-y), transparent 98%, #000);
               mask: radial-gradient(circle 10px at var(--cut-x) var(--cut-y), transparent 98%, #000);
       transition: background-color 0.6s ease 0.25s, box-shadow 0.6s ease 0.25s,
-                  --cut-x 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.45s, --cut-y 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
+                  --cut-x 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.45s, --cut-y 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.45s,
+                  scale 0.3s ease;
     }
-    .theme-orbit:hover .orbit-body { scale: 1.12; }
-    .orbit-body { transition: offset-distance 0.95s cubic-bezier(0.65, 0, 0.35, 1), scale 0.3s ease; }
+    /* Powiększenie na hover na samej tarczy i promieniach (wokół ich środka), nie na elemencie jadącym po ścieżce:
+       Safari skaluje element z offset-path względem innego punktu i księżyc uciekał poza ramkę */
+    .theme-orbit:hover .orbit-orb, .theme-orbit:hover .orbit-rays { scale: 1.12; }
+    .orbit-body { transition: offset-distance 0.95s cubic-bezier(0.65, 0, 0.35, 1); }
 
     /* Zmiana motywu: nowy wygląd wjeżdża od lewej do prawej z miękką krawędzią (View Transitions) */
     ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
@@ -833,13 +838,14 @@
       box-shadow: 0 10px 26px -14px rgba(76, 29, 149, 0.45);
     }
     html[data-theme="light"] .orbit-body { offset-distance: 0%; }
-    html[data-theme="light"] .orbit-rays { opacity: 1; transform: none; transition-delay: 0.45s; animation: orbitSpin 14s linear infinite; }
+    html[data-theme="light"] .orbit-rays { opacity: 1; transform: none; transition-delay: 0.45s, 0.45s, 0s; animation: orbitSpin 14s linear infinite; }
     html[data-theme="light"] .orbit-orb {
       background-color: #f59e0b;
       box-shadow: 0 0 14px rgba(245, 158, 11, 0.8), 0 0 30px rgba(251, 191, 36, 0.45);
       --cut-x: 40px; --cut-y: -10px;
       transition: background-color 0.6s ease 0.25s, box-shadow 0.6s ease 0.25s,
-                  --cut-x 0.45s cubic-bezier(0.22, 1, 0.36, 1), --cut-y 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+                  --cut-x 0.45s cubic-bezier(0.22, 1, 0.36, 1), --cut-y 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                  scale 0.3s ease;
     }
     html[data-theme="light"] .orbit-star { opacity: 0; transition-delay: 0s; }
     html[data-theme="light"] .orbit-stop-sun  { opacity: 0.2; }
