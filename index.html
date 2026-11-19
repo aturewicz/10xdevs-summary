@@ -440,7 +440,7 @@
     /* ===== Nawigacja po sekcjach ===== */
     html { scroll-behavior: smooth; }
 
-    .nav-target { scroll-margin-top: 96px; }
+    .nav-target { scroll-margin-top: 150px; }
 
     .nav-pill {
       --pill: 168, 85, 247;
@@ -545,37 +545,90 @@
       .sparkle-dot { animation: none; }
     }
 
-    /* ===== Przełącznik trybu dzień / noc ===== */
-    .theme-toggle {
-      position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 45;
-      display: grid; place-items: center;
-      width: 3.25rem; height: 3.25rem;
-      border-radius: 9999px;
-      color: #fbbf24;
-      background:
-        linear-gradient(rgba(10, 14, 29, 0.9), rgba(10, 14, 29, 0.9)) padding-box,
-        linear-gradient(135deg, #22d3ee, #a855f7, #f59e0b) border-box;
-      border: 1.5px solid transparent;
-      box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.7), 0 0 22px rgba(168, 85, 247, 0.35);
-      backdrop-filter: blur(12px);
-      cursor: pointer;
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
-    }
-    .theme-toggle:hover { transform: translateY(-3px) rotate(-8deg); box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.7), 0 0 30px rgba(245, 158, 11, 0.5); }
-    .theme-toggle:focus-visible { outline: 2px solid #22d3ee; outline-offset: 3px; }
-    .theme-toggle svg {
-      grid-area: 1 / 1; width: 1.45rem; height: 1.45rem;
-      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
-    }
-    /* Noc: widać słońce (kliknij, by zrobić dzień); dzień: widać księżyc */
-    .theme-toggle .tt-sun  { filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.8)); }
-    .theme-toggle .tt-moon { opacity: 0; transform: rotate(-90deg) scale(0.4); }
+    /* ===== Przełącznik dzień / noc: słońce leci po łuku i zmienia się w księżyc ===== */
+    @property --cut-x { syntax: '<length>'; inherits: false; initial-value: 40px; }
+    @property --cut-y { syntax: '<length>'; inherits: false; initial-value: -10px; }
 
+    .theme-switch-wrap {
+      position: fixed; top: 0.6rem; left: 50%; z-index: 45;
+      transform: translateX(-50%);
+    }
+    .theme-orbit {
+      position: relative; display: block;
+      width: 132px; height: 52px;
+      border-radius: 1.1rem;
+      background:
+        linear-gradient(rgba(10, 14, 29, 0.88), rgba(10, 14, 29, 0.88)) padding-box,
+        linear-gradient(90deg, rgba(245, 158, 11, 0.7), rgba(168, 85, 247, 0.7) 55%, rgba(34, 211, 238, 0.7)) border-box;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.8), 0 0 22px rgba(139, 92, 246, 0.22);
+      backdrop-filter: blur(14px);
+      cursor: pointer;
+      transition: background 0.6s ease, box-shadow 0.6s ease;
+      /* Przy zmianie motywu przełącznik jest osobną, żywą warstwą nad przesuwającą się stroną */
+      view-transition-name: theme-switch;
+    }
+    .theme-orbit:focus-visible { outline: 2px solid #22d3ee; outline-offset: 3px; }
+
+    .orbit-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+    .orbit-track { fill: none; stroke: url(#orbit-grad); stroke-width: 1.5; stroke-dasharray: 2 5; stroke-linecap: round; opacity: 0.6; }
+    .orbit-stop { fill: none; stroke-width: 1.2; stroke-dasharray: 2 3; transition: opacity 0.5s ease; }
+    .orbit-stop-sun  { stroke: #f59e0b; opacity: 0.55; }
+    .orbit-stop-moon { stroke: #a78bfa; opacity: 0.2; }
+
+    /* Gwiazdy zapalają się nocą */
+    .orbit-star {
+      position: absolute; width: 3px; height: 3px; border-radius: 50%;
+      background: #e0e7ff; box-shadow: 0 0 6px #c7d2fe;
+      opacity: 0.9; transition: opacity 0.6s ease 0.5s;
+      animation: orbitTwinkle 2.6s ease-in-out infinite;
+    }
+    .orbit-star:nth-of-type(1) { left: 50px; top: 9px; }
+    .orbit-star:nth-of-type(2) { left: 68px; top: 5px; width: 2px; height: 2px; animation-delay: 0.8s; }
+    .orbit-star:nth-of-type(3) { left: 84px; top: 12px; animation-delay: 1.5s; }
+    @keyframes orbitTwinkle { 50% { transform: scale(0.4); } }
+
+    /* Ciało niebieskie poruszające się po krzywej */
+    .orbit-body {
+      position: absolute; top: 0; left: 0;
+      width: 24px; height: 24px;
+      offset-path: path('M 22 20 C 46 46, 86 46, 110 20');
+      offset-rotate: 0deg;
+      offset-distance: 100%;
+    }
+    .orbit-rays {
+      position: absolute; inset: -7px; border-radius: 50%;
+      background: repeating-conic-gradient(#fbbf24 0deg 7deg, transparent 7deg 30deg);
+      -webkit-mask: radial-gradient(closest-side, transparent 72%, #000 75%);
+              mask: radial-gradient(closest-side, transparent 72%, #000 75%);
+      opacity: 0; transform: scale(0.4) rotate(-90deg);
+      transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+    .orbit-orb {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.9), transparent 58%) #a78bfa;
+      box-shadow: 0 0 14px rgba(167, 139, 250, 0.85), 0 0 30px rgba(139, 92, 246, 0.45);
+      /* Wycięcie tworzy sierp: w nocy cień nasuwa się na tarczę, w dzień odjeżdża */
+      --cut-x: 17px; --cut-y: 6px;
+      -webkit-mask: radial-gradient(circle 10px at var(--cut-x) var(--cut-y), transparent 98%, #000);
+              mask: radial-gradient(circle 10px at var(--cut-x) var(--cut-y), transparent 98%, #000);
+      transition: background-color 0.6s ease 0.25s, box-shadow 0.6s ease 0.25s,
+                  --cut-x 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.45s, --cut-y 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
+    }
+    .theme-orbit:hover .orbit-body { scale: 1.12; }
+    .orbit-body { transition: offset-distance 0.95s cubic-bezier(0.65, 0, 0.35, 1), scale 0.3s ease; }
+
+    /* Zmiana motywu: nowy wygląd wjeżdża od lewej do prawej z miękką krawędzią (View Transitions) */
     ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    ::view-transition-new(root) {
+      -webkit-mask: linear-gradient(90deg, #000 45%, transparent 55%) 100% 0 / 250% 100% no-repeat;
+              mask: linear-gradient(90deg, #000 45%, transparent 55%) 100% 0 / 250% 100% no-repeat;
+    }
+    ::view-transition-group(theme-switch), ::view-transition-new(theme-switch) { animation: none; }
+    ::view-transition-old(theme-switch) { display: none; }
 
     @media (prefers-reduced-motion: reduce) {
-      .theme-toggle, .theme-toggle svg { transition: none; }
-      .theme-toggle:hover { transform: none; }
+      .theme-orbit *, .theme-orbit { transition: none !important; animation: none !important; }
     }
 
     /* =====================================================================
@@ -677,35 +730,60 @@
     html[data-theme="light"] .profile-aura { opacity: 0.45; }
     html[data-theme="light"] .hud-corner { border-color: #0891b2; filter: drop-shadow(0 0 4px rgba(8, 145, 178, 0.5)); }
 
-    /* Przełącznik w dzień: jasna kapsuła z księżycem */
-    html[data-theme="light"] .theme-toggle {
-      color: #6d28d9;
+    /* Przełącznik w dzień: jasne szkło, słońce po lewej, gwiazdy zgaszone */
+    html[data-theme="light"] .theme-orbit {
       background:
-        linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)) padding-box,
-        linear-gradient(135deg, #22d3ee, #a855f7, #f59e0b) border-box;
-      box-shadow: 0 10px 26px -10px rgba(76, 29, 149, 0.45);
+        linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)) padding-box,
+        linear-gradient(90deg, rgba(245, 158, 11, 0.7), rgba(168, 85, 247, 0.7) 55%, rgba(34, 211, 238, 0.7)) border-box;
+      box-shadow: 0 10px 26px -14px rgba(76, 29, 149, 0.45);
     }
-    html[data-theme="light"] .theme-toggle .tt-sun  { opacity: 0; transform: rotate(90deg) scale(0.4); }
-    html[data-theme="light"] .theme-toggle .tt-moon { opacity: 1; transform: none; }
+    html[data-theme="light"] .orbit-body { offset-distance: 0%; }
+    html[data-theme="light"] .orbit-rays { opacity: 1; transform: none; transition-delay: 0.45s; animation: orbitSpin 14s linear infinite; }
+    html[data-theme="light"] .orbit-orb {
+      background-color: #f59e0b;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.8), 0 0 30px rgba(251, 191, 36, 0.45);
+      --cut-x: 40px; --cut-y: -10px;
+      transition: background-color 0.6s ease 0.25s, box-shadow 0.6s ease 0.25s,
+                  --cut-x 0.45s cubic-bezier(0.22, 1, 0.36, 1), --cut-y 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    html[data-theme="light"] .orbit-star { opacity: 0; transition-delay: 0s; }
+    html[data-theme="light"] .orbit-stop-sun  { opacity: 0.2; }
+    html[data-theme="light"] .orbit-stop-moon { opacity: 0.55; }
+    @keyframes orbitSpin { from { rotate: 0deg; } to { rotate: 360deg; } }
   </style>
 </head>
 <body class="space-bg min-h-screen antialiased selection:bg-purple-500 selection:text-white">
 
-  <!-- PRZEŁĄCZNIK TRYBU DZIEŃ / NOC -->
-  <button id="theme-toggle" type="button" class="theme-toggle" aria-label="Przełącz tryb dzienny / nocny">
-    <svg class="tt-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
-    <svg class="tt-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/><path d="M17 3.5v3M15.5 5h3" stroke-width="1.6"/></svg>
-  </button>
+  <!-- PRZEŁĄCZNIK TRYBU DZIEŃ / NOC (u góry na środku): słońce wędruje po łuku do księżyca -->
+  <div class="theme-switch-wrap">
+    <button id="theme-toggle" type="button" role="switch" class="theme-orbit" aria-label="Tryb nocny">
+      <svg class="orbit-svg" viewBox="0 0 132 52" aria-hidden="true">
+        <defs>
+          <linearGradient id="orbit-grad" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#f59e0b" /><stop offset="0.55" stop-color="#a855f7" /><stop offset="1" stop-color="#818cf8" />
+          </linearGradient>
+          <mask id="orbit-track-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="132" height="52">
+            <rect width="132" height="52" fill="#fff" /><circle cx="22" cy="20" r="15" /><circle cx="110" cy="20" r="15" />
+          </mask>
+        </defs>
+        <path class="orbit-track" mask="url(#orbit-track-mask)" d="M 22 20 C 46 46, 86 46, 110 20" />
+        <circle class="orbit-stop orbit-stop-sun" cx="22" cy="20" r="14" />
+        <circle class="orbit-stop orbit-stop-moon" cx="110" cy="20" r="14" />
+      </svg>
+      <span class="orbit-star" aria-hidden="true"></span><span class="orbit-star" aria-hidden="true"></span><span class="orbit-star" aria-hidden="true"></span>
+      <span class="orbit-body" aria-hidden="true"><span class="orbit-rays"></span><span class="orbit-orb"></span></span>
+    </button>
+  </div>
 
   <!-- PRZYPIĘTY PASEK NAWIGACJI (pojawia się po przewinięciu nagłówka; przyciski kopiowane z #section-nav) -->
-  <div id="sticky-nav" class="fixed top-3 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-fit" aria-hidden="true">
+  <div id="sticky-nav" class="fixed top-[4.1rem] left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-fit" aria-hidden="true">
     <div class="rounded-2xl p-[1px] bg-gradient-to-r from-cyan-400/50 via-purple-500/50 to-amber-400/50 shadow-[0_10px_40px_rgba(0,0,0,0.6)]">
       <nav class="nav-scroll flex items-center gap-2 overflow-x-auto rounded-2xl bg-[#0a0e1d]/[0.88] backdrop-blur-xl px-2 py-2" aria-label="Sekcje raportu (pasek)"></nav>
     </div>
   </div>
 
   <!-- GŁÓWNY KONTENER -->
-  <div class="page max-w-[1540px] mx-auto px-4 sm:px-8 py-10 space-y-14">
+  <div class="page max-w-[1540px] mx-auto px-4 sm:px-8 pt-20 pb-10 space-y-14">
 
     <!-- HERO SECTION (PROFIL + STATYSTYKI MISJI) -->
     <header class="relative p-[1px] bg-gradient-to-r from-purple-500/60 via-cyan-400/60 to-purple-500/60 hud-frame shadow-[0_0_60px_rgba(168,85,247,0.2)]">
@@ -1144,7 +1222,7 @@
     const thumbOf = (file) => file.replace('images/', 'images/thumbs/').replace(/\.jpg$/, '.webp');
 
     // ==========================================
-    // TRYB DZIEŃ / NOC: przełącznik z kołowym odsłonięciem (View Transitions), zapamiętany w localStorage
+    // TRYB DZIEŃ / NOC: przełącznik z przejściem od lewej do prawej (View Transitions), zapamiętany w localStorage
     // ==========================================
     function initThemeToggle() {
       const root = document.documentElement;
@@ -1157,8 +1235,8 @@
         root.dataset.theme = theme;
         root.classList.toggle('dark', theme === 'dark');
         const light = theme === 'light';
-        btn.setAttribute('aria-pressed', String(light));
-        btn.title = light ? 'Tryb dzienny — przełącz na nocny' : 'Tryb nocny — przełącz na dzienny';
+        btn.setAttribute('aria-checked', String(!light));
+        btn.title = light ? 'Przełącz na tryb nocny' : 'Przełącz na tryb dzienny';
         if (metaColor) metaColor.content = light ? '#eef2fb' : '#05070f';
       };
 
@@ -1177,13 +1255,11 @@
 
         if (!document.startViewTransition || reduceMotion.matches) { apply(next); return; }
 
-        const r = btn.getBoundingClientRect();
-        const x = r.left + r.width / 2, y = r.top + r.height / 2;
-        const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+        // Nowy motyw przesuwa się od lewej do prawej; słońce/księżyc leci po łuku w żywej warstwie przełącznika
         document.startViewTransition(() => apply(next)).ready.then(() => {
           root.animate(
-            { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-            { duration: 650, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' }
+            { maskPosition: ['100% 0', '0% 0'], webkitMaskPosition: ['100% 0', '0% 0'] },
+            { duration: 900, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'forwards', pseudoElement: '::view-transition-new(root)' }
           );
         });
       });
