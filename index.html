@@ -724,6 +724,11 @@
       -webkit-mask: linear-gradient(90deg, #000 45%, transparent 55%) 100% 0 / 250% 100% no-repeat;
               mask: linear-gradient(90deg, #000 45%, transparent 55%) 100% 0 / 250% 100% no-repeat;
     }
+    /* Przejście na dzień: maska odwrócona, nowy wygląd wjeżdża od prawej do lewej */
+    html[data-wipe="rtl"]::view-transition-new(root) {
+      -webkit-mask: linear-gradient(270deg, #000 45%, transparent 55%) 0% 0 / 250% 100% no-repeat;
+              mask: linear-gradient(270deg, #000 45%, transparent 55%) 0% 0 / 250% 100% no-repeat;
+    }
     ::view-transition-group(theme-switch), ::view-transition-new(theme-switch) { animation: none; }
     ::view-transition-old(theme-switch) { display: none; }
 
@@ -1380,10 +1385,16 @@
           return;
         }
 
-        // Nowy motyw przesuwa się od lewej do prawej; słońce/księżyc leci po łuku w żywej warstwie przełącznika
-        document.startViewTransition(() => apply(next)).ready.then(() => {
+        // Noc wjeżdża od lewej do prawej, dzień od prawej do lewej — w tę samą stronę, w którą leci słońce/księżyc
+        const toLight = next === 'light';
+        const from = toLight ? '0% 0' : '100% 0';
+        const to = toLight ? '100% 0' : '0% 0';
+        root.dataset.wipe = toLight ? 'rtl' : 'ltr';
+        const transition = document.startViewTransition(() => apply(next));
+        transition.finished.finally(() => delete root.dataset.wipe);
+        transition.ready.then(() => {
           root.animate(
-            { maskPosition: ['100% 0', '0% 0'], webkitMaskPosition: ['100% 0', '0% 0'] },
+            { maskPosition: [from, to], webkitMaskPosition: [from, to] },
             { duration: 900, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'forwards', pseudoElement: '::view-transition-new(root)' }
           );
         });
