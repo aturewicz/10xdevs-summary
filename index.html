@@ -727,6 +727,13 @@
     ::view-transition-group(theme-switch), ::view-transition-new(theme-switch) { animation: none; }
     ::view-transition-old(theme-switch) { display: none; }
 
+    /* Telefony: zamiast zrzutu strony krótkie przenikanie kolorów (przełącznik zachowuje własne animacje) */
+    html.theme-fading :not(.theme-switch-wrap, .theme-switch-wrap *),
+    html.theme-fading :not(.theme-switch-wrap, .theme-switch-wrap *)::before,
+    html.theme-fading :not(.theme-switch-wrap, .theme-switch-wrap *)::after {
+      transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease, fill 0.5s ease !important;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .theme-orbit *, .theme-orbit, .theme-switch-wrap, .theme-dock { transition: none !important; animation: none !important; }
     }
@@ -1343,6 +1350,8 @@
       const btn = document.getElementById('theme-toggle');
       const metaColor = document.querySelector('meta[name="theme-color"]');
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+      let fadeTimer;
 
       const apply = (theme) => {
         root.dataset.theme = theme;
@@ -1360,6 +1369,16 @@
         try { localStorage.setItem('theme', next); } catch (err) {}
 
         if (!document.startViewTransition || reduceMotion.matches) { apply(next); return; }
+
+        // Na dotykowych telefonach zrzut strony w View Transition jest liczony względem viewportu z wysuniętym
+        // paskiem adresu, więc przy schowanym pasku sekcje podskakują na czas animacji. Tam same kolory płynnie się przenikają.
+        if (!finePointer.matches) {
+          clearTimeout(fadeTimer);
+          root.classList.add('theme-fading');
+          apply(next);
+          fadeTimer = setTimeout(() => root.classList.remove('theme-fading'), 650);
+          return;
+        }
 
         // Nowy motyw przesuwa się od lewej do prawej; słońce/księżyc leci po łuku w żywej warstwie przełącznika
         document.startViewTransition(() => apply(next)).ready.then(() => {
